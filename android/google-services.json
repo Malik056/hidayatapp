@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "932250443172",
+    "firebase_url": "https://hidoyaat-default-rtdb.firebaseio.com",
+    "project_id": "hidoyaat",
+    "storage_bucket": "hidoyaat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932250443172:android:f7d432b9032e9a2d7cb531",
+        "android_client_info": {
+          "package_name": "com.islam.hidayat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "932250443172-rac0rcanpj6qbqbjr2bvc2ctpi8udqi2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJFelwLP8lyaOSXQswOT9PshYVW7dRfcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "932250443172-rac0rcanpj6qbqbjr2bvc2ctpi8udqi2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

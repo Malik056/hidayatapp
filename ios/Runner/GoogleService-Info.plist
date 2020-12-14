@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>932250443172-cmjrl1lp9u1lpj0v1ca61l9cr8mutm00.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.932250443172-cmjrl1lp9u1lpj0v1ca61l9cr8mutm00</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCMcdUsqCo49-zsgN_XCUks8L04lL3aT2I</string>
+	<key>GCM_SENDER_ID</key>
+	<string>932250443172</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.islam.hidayat</string>
+	<key>PROJECT_ID</key>
+	<string>hidoyaat</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hidoyaat.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:932250443172:ios:3793ecc89db8a2287cb531</string>
+	<key>DATABASE_URL</key>
+	<string>https://hidoyaat-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
