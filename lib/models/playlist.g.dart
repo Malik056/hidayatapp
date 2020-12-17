@@ -13,7 +13,7 @@ Playlist _$PlaylistFromJson(Map<String, dynamic> json) {
   return Playlist(
     json['id'] as String,
     json['name'] as String,
-    json['imageUrl'] as String,
+    json['image'] as String,
     json['description'] as String,
     json['categoryId'] as String,
   );
@@ -21,7 +21,7 @@ Playlist _$PlaylistFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$PlaylistToJson(Playlist instance) => <String, dynamic>{
       'name': instance.name,
-      'imageUrl': instance.imageUrl,
+      'image': instance.image,
       'categoryId': instance.categoryId,
       'description': instance.description,
       'id': instance.id,

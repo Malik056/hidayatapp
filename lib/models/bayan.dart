@@ -6,9 +6,9 @@ part 'bayan.g.dart';
 
 @JsonSerializable(nullable: true)
 class Bayan {
-  String url;
+  String link;
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
-  String title;
+  String name;
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String id;
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
@@ -16,7 +16,7 @@ class Bayan {
   @JsonKey(defaultValue: "")
   String description;
 
-  Bayan(this.id, this.url, this.title, this.description, this.playlistId);
+  Bayan(this.id, this.link, this.name, this.description, this.playlistId);
   factory Bayan.fromJson(Map<String, dynamic> json) => _$BayanFromJson(json);
   factory Bayan.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.data());
@@ -27,8 +27,8 @@ class Bayan {
 
   bool equals(Bayan other) {
     return id == other.id &&
-        title == other.title &&
-        url == other.url &&
+        name == other.name &&
+        link == other.link &&
         description == other.description &&
         playlistId == other.playlistId;
   }
@@ -38,8 +38,8 @@ class Bayan {
   static String get getSQLString => '''
   CREATE TABLE IF NOT EXISTS $tableName (
     id STRING PRIMARY KEY,
-    title TEXT NOT NULL,
-    url TEXT NOT NULL,
+    name TEXT NOT NULL,
+    link TEXT NOT NULL,
     description TEXT,
     playlistId TEXT NOT NULL,
     FOREIGN KEY (playlistId)

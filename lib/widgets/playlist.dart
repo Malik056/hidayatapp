@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hidayat/models/playlist.dart';
+import 'package:hidayat/routes/bayans.dart';
 
 class PlaylistWidget extends StatelessWidget {
   final Playlist playlist;
@@ -15,9 +16,7 @@ class PlaylistWidget extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(CupertinoPageRoute(
           builder: (context) {
-            return Center(
-              child: Text("Hello"),
-            );
+            return BayansRoute(playlist: playlist);
           },
         ));
       },
@@ -31,7 +30,7 @@ class PlaylistWidget extends StatelessWidget {
               child: CachedNetworkImage(
                 fadeInDuration: Duration.zero,
                 fadeOutDuration: Duration.zero,
-                imageUrl: playlist.imageUrl ?? '',
+                imageUrl: playlist.image ?? '',
                 errorWidget: (context, url, error) {
                   print(error);
                   return Image.asset(
@@ -75,6 +74,45 @@ class PlaylistWidget extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class EmptyPlaylistWidget extends StatelessWidget {
+  const EmptyPlaylistWidget({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    TextTheme theme = Theme.of(context).textTheme;
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.7,
+      child: Stack(
+        alignment: Alignment.center,
+        fit: StackFit.expand,
+        children: [
+          Opacity(
+            opacity: 0.7,
+            child: SizedBox.expand(
+                child: Container(
+              decoration: ShapeDecoration(
+                color: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            )),
+          ),
+          Center(
+              child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              "No Playlist Found!",
+              textAlign: TextAlign.center,
+              style: theme.headline4.copyWith(color: Colors.white),
+            ),
+          )),
+        ],
       ),
     );
   }

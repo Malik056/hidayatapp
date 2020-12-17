@@ -8,20 +8,20 @@ part of 'bayan.dart';
 
 Bayan _$BayanFromJson(Map<String, dynamic> json) {
   $checkKeys(json,
-      requiredKeys: const ['title', 'id', 'playlistId'],
-      disallowNullValues: const ['title', 'id', 'playlistId']);
+      requiredKeys: const ['name', 'id', 'playlistId'],
+      disallowNullValues: const ['name', 'id', 'playlistId']);
   return Bayan(
     json['id'] as String,
-    json['url'] as String,
-    json['title'] as String,
+    json['link'] as String,
+    json['name'] as String,
     json['description'] as String ?? '',
     json['playlistId'] as String,
   );
 }
 
 Map<String, dynamic> _$BayanToJson(Bayan instance) => <String, dynamic>{
-      'url': instance.url,
-      'title': instance.title,
+      'link': instance.link,
+      'name': instance.name,
       'id': instance.id,
       'playlistId': instance.playlistId,
       'description': instance.description,

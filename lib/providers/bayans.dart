@@ -17,9 +17,6 @@ class BayansProvider extends ChangeNotifier {
     _bayansStreamController = StreamController();
     MySQLiteDatabase mySQLiteDatabase = MySQLiteDatabase.getInstance();
     mySQLiteDatabase.bayanDbHelper.getBayans(playlistId).then((value) {
-      if (value == null || value.isEmpty) {
-        return;
-      }
       state = value;
       _bayansStreamController.add(state);
       connectionState = ConnectionState.active;
@@ -31,7 +28,7 @@ class BayansProvider extends ChangeNotifier {
           .snapshots()
           .listen((event) async {
         error = null;
-        await mySQLiteDatabase.bayanDbHelper.clearBayans(playlistId);
+        // await mySQLiteDatabase.bayanDbHelper.clearBayans(bayanId);
         if (connectionState != ConnectionState.active) {
           connectionState = ConnectionState.active;
         }
@@ -41,7 +38,15 @@ class BayansProvider extends ChangeNotifier {
         event.docChanges.forEach((element) {
           Bayan bayan = Bayan.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
-            mySQLiteDatabase.bayanDbHelper.addBayan(bayan);
+            Bayan bayanLocal =
+                state.firstWhere((_) => bayan.id == _.id, orElse: () {
+              return null;
+            });
+            if (bayanLocal == null) {
+              mySQLiteDatabase.bayanDbHelper.addBayan(bayan);
+            } else if (!bayanLocal.equals(bayan)) {
+              mySQLiteDatabase.bayanDbHelper.updateBayan(bayan);
+            }
             tempState.add(bayan);
           } else if (element.type == DocumentChangeType.modified) {
             mySQLiteDatabase.bayanDbHelper.updateBayan(bayan);

@@ -10,7 +10,7 @@ part 'playlist.g.dart';
 class Playlist {
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String name;
-  String imageUrl;
+  String image;
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String categoryId;
   String description;
@@ -19,8 +19,7 @@ class Playlist {
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String id;
 
-  Playlist(
-      this.id, this.name, this.imageUrl, this.description, this.categoryId);
+  Playlist(this.id, this.name, this.image, this.description, this.categoryId);
   factory Playlist.fromJson(Map<String, dynamic> json) =>
       _$PlaylistFromJson(json);
   factory Playlist.fromSnapshot(DocumentSnapshot snapshot) {
@@ -33,7 +32,7 @@ class Playlist {
   bool equals(Playlist other) {
     return id == other.id &&
         name == other.name &&
-        imageUrl == other.imageUrl &&
+        image == other.image &&
         description == other.description &&
         categoryId == other.categoryId;
   }
@@ -44,7 +43,7 @@ class Playlist {
   CREATE TABLE IF NOT EXISTS $tableName (
     id STRING PRIMARY KEY,
     name TEXT NOT NULL,
-    imageUrl TEXT,
+    image TEXT,
     description TEXT,
     categoryId TEXT NOT NULL,
     FOREIGN KEY (categoryId)

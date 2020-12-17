@@ -55,6 +55,7 @@ class PlaylistsProvider extends ChangeNotifier {
             mySQLiteDatabase.playlistDbHelper.deletePlaylist(playlist.id);
           }
         });
+
         if (state == null ||
             state.isEmpty ||
             state.length != tempState.length) {
