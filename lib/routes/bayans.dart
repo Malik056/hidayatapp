@@ -1,9 +1,10 @@
+import 'package:assets_audio_player/assets_audio_player.dart' as audio_player;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hidayat/models/playlist.dart';
 import 'package:hidayat/providers/bayans.dart';
 import 'package:hidayat/providers/current_playing.dart';
-import 'package:hidayat/providers/playlists.dart';
+import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
 class BayansRoute extends StatelessWidget {
@@ -23,106 +24,192 @@ class BayansRoute extends StatelessWidget {
     return Scaffold(
       body: ChangeNotifierProvider<BayansProvider>(
           create: (context) => BayansProvider(playlist.id),
-          child: Consumer<BayansProvider>(
-            builder: (ctx, data, _) {
-              return NestedScrollView(
-                headerSliverBuilder: (ctx, _) {
-                  return [
-                    SliverAppBar(
-                      floating: true,
-                      pinned: true,
-                      expandedHeight: mediaQuery.height * 0.3,
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: CachedNetworkImage(
-                          imageUrl: playlist.image ?? '',
-                          fadeInDuration: Duration.zero,
-                          fadeOutDuration: Duration.zero,
-                          fit: BoxFit.cover,
-                          progressIndicatorBuilder: (context, url, progress) =>
-                              Center(
-                                  child: CircularProgressIndicator(
-                            value: progress.downloaded / progress.totalSize,
-                          )),
-                          errorWidget: (context, url, error) => Image.asset(
-                              'images/placeholder_playlist.jpg',
-                              fit: BoxFit.cover),
-                          // placeholder: (ctx, url) => Image.asset(
-                          //     'images/placeholder_playlist.jpg',
-                          //     fit: BoxFit.cover),
+          child: Consumer<PlayingNowProvider>(
+            builder: (ctx, playingNow, _) => Consumer<BayansProvider>(
+              builder: (ctx, data, _) {
+                return NestedScrollView(
+                  headerSliverBuilder: (ctx, _) {
+                    return [
+                      SliverAppBar(
+                        floating: true,
+                        pinned: true,
+                        expandedHeight: mediaQuery.height * 0.3,
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: CachedNetworkImage(
+                            imageUrl: playlist.image ?? '',
+                            fadeInDuration: Duration.zero,
+                            fadeOutDuration: Duration.zero,
+                            fit: BoxFit.cover,
+                            progressIndicatorBuilder:
+                                (context, url, progress) => Center(
+                                    child: CircularProgressIndicator(
+                              value: (progress?.downloaded ?? 0.0) /
+                                  (progress?.totalSize ?? 1),
+                            )),
+                            errorWidget: (context, url, error) => Image.asset(
+                                'images/placeholder_playlist.jpg',
+                                fit: BoxFit.cover),
+                            // placeholder: (ctx, url) => Image.asset(
+                            //     'images/placeholder_playlist.jpg',
+                            //     fit: BoxFit.cover),
+                          ),
                         ),
-                      ),
-                      title: Text(playlist.name ?? 'Playlist'),
-                    )
-                  ];
-                },
-                body: isLoading(data)
-                    ? Center(child: CircularProgressIndicator())
-                    : (data.state?.isEmpty ?? true)
-                        ? Center(
-                            child: Text(
-                              "Nothing Found",
-                              style: textTheme.headline5.copyWith(
-                                color: Colors.black,
+                        title: Text(playlist.name ?? 'Playlist'),
+                      )
+                    ];
+                  },
+                  body: isLoading(data)
+                      ? Center(child: CircularProgressIndicator())
+                      : (data.state?.isEmpty ?? true)
+                          ? Center(
+                              child: Text(
+                                "Nothing Found",
+                                style: textTheme.headline5.copyWith(
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: data.state.length,
-                            itemBuilder: (ctx, index) {
-                              playlist.bayans = data.state;
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      var state =
-                                          Provider.of<PlayingNowProvider>(
-                                                  context)
-                                              .state;
-                                      if (state.playlist == null ||
-                                          state.playlist.id != playlist.id ||
-                                          state.bayanIndex != index) {
-                                        PlayingNowState newState =
-                                            PlayingNowState();
-                                        newState.playlist = playlist;
-                                        newState.bayanIndex = index;
-                                      } else {}
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                              flex: 1,
-                                              child: Text(
-                                                "${index + 1}",
-                                                textAlign: TextAlign.center,
-                                                style: textTheme.subtitle1
-                                                    .copyWith(
-                                                  color: Colors.grey,
-                                                ),
-                                              )),
-                                          Expanded(
-                                            flex: 4,
-                                            child: Text(
-                                              data.state[index].name,
-                                              style:
-                                                  textTheme.subtitle1.copyWith(
-                                                color: Colors.black,
-                                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: data.state.length,
+                              itemBuilder: (ctx, index) {
+                                playlist.bayans = data.state;
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    InkWell(
+                                      onTap: () async {
+                                        var provider =
+                                            Provider.of<PlayingNowProvider>(
+                                                context,
+                                                listen: false);
+                                        // provider.state =
+                                        var abc = PlayingNowState();
+                                        abc.playlist = playlist;
+                                        abc.bayanIndex = index;
+                                        provider.state = abc;
+                                        provider.player.open(
+                                          audio_player.Playlist(
+                                            audios: playlist.bayans
+                                                .map(
+                                                  (e) => audio_player.Audio
+                                                      .network(e.link),
+                                                )
+                                                .toList(),
+                                          ),
+                                          autoStart: false,
+                                        );
+                                        provider.player
+                                            .playlistPlayAtIndex(index);
+
+                                        // if (!(AudioService.running ?? false)) {
+                                        //   await AudioService.start(
+                                        //       backgroundTaskEntrypoint:
+                                        //           entrypoint);
+                                        // }
+                                        // AudioService.customAction(
+                                        //     "updatePlaylist", {
+                                        //   "playlist": jsonEncode(
+                                        //       Map<String, dynamic>.from(
+                                        //           playlist.toJson())),
+                                        //   "bayans": jsonEncode(playlist.bayans
+                                        //       .map<Map<String, dynamic>>((e) =>
+                                        //           Map<String, dynamic>.from(
+                                        //               e.toJson()))
+                                        //       .toList()),
+                                        //   "index": index,
+                                        // }).then((value) {
+                                        //   var state = PlayingNowState();
+                                        //   state.playlist = playlist;
+                                        //   state.bayanIndex = index;
+                                        //   state.duration =
+                                        //       Duration(seconds: value ?? 0);
+                                        //   Provider.of<PlayingNowProvider>(
+                                        //           context,
+                                        //           listen: false)
+                                        //       .state = state;
+                                        // });
+                                        // var state =
+                                        //     Provider.of<PlayingNowProvider>(
+                                        //             context,
+                                        //             listen: false)
+                                        //         .state;
+                                        // if (state.playlist == null ||
+                                        //     state.playlist.id != playlist.id ||
+                                        //     state.bayanIndex != index) {
+                                        //   PlayingNowState newState =
+                                        //       PlayingNowState();
+                                        //   newState.playlist = playlist;
+                                        //   newState.bayanIndex = index;
+                                        //   PlayingNowProvider provider =
+                                        //       Provider.of<PlayingNowProvider>(
+                                        //     context,
+                                        //     listen: false,
+                                        //   );
+                                        //   provider.state = newState;
+                                        //   provider.play();
+                                        // } else {}
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                                flex: 1,
+                                                child: Text(
+                                                  "${index + 1}",
+                                                  textAlign: TextAlign.center,
+                                                  style: textTheme.subtitle1
+                                                      .copyWith(
+                                                    color: Colors.grey,
+                                                  ),
+                                                )),
+                                            Expanded(
+                                              flex: 4,
+                                              child: (playingNow?.state
+                                                              ?.playlist?.id ==
+                                                          playlist.id &&
+                                                      playingNow.state
+                                                              .bayanIndex ==
+                                                          index)
+                                                  ? Marquee(
+                                                      text: data.state[index]
+                                                              .name ??
+                                                          "Anonymous",
+                                                      style: textTheme.subtitle1
+                                                          .copyWith(
+                                                        color: Colors.black,
+                                                      ),
+                                                      blankSpace: 200,
+                                                    )
+                                                  : Text(
+                                                      data.state[index].name ??
+                                                          "Anonymous",
+                                                      style: textTheme.subtitle1
+                                                          .copyWith(
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
                                             ),
-                                          )
-                                        ],
+                                            if (playingNow
+                                                        ?.state?.playlist?.id ==
+                                                    playlist.id &&
+                                                playingNow.state.bayanIndex ==
+                                                    index)
+                                              Icon(Icons.volume_up)
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Divider(),
-                                ],
-                              );
-                            },
-                          ),
-              );
-            },
+                                    Divider(),
+                                  ],
+                                );
+                              },
+                            ),
+                );
+              },
+            ),
           )),
     );
   }

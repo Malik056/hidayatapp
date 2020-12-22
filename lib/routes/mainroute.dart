@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class MainRoute extends StatelessWidget {
   final PageController controller = PageController();
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<CategoriesProvider>(

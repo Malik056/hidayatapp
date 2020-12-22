@@ -1,34 +1,16 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:hidayat/models/playlist.dart';
+import 'package:hidayat/models/playlist.dart' as myPlaylist;
 
 class PlayingNowState {
-  Playlist playlist;
+  myPlaylist.Playlist playlist;
   int bayanIndex;
 }
 
 class PlayingNowProvider extends ChangeNotifier {
   PlayingNowState _state = PlayingNowState();
-  Duration duration = Duration.zero;
-  Duration position = Duration.zero;
-  FlutterSoundPlayer player;
-  Future<bool> initialized;
   double currentVolume = 0;
-
-  PlayingNowProvider() {
-    player = FlutterSoundPlayer();
-
-    initialized = player.openAudioSession().then<bool>((value) {
-      player.onProgress.listen((event) {
-        duration = event.duration;
-        position = event.position;
-        notifyListeners();
-      });
-      return true;
-    }).catchError((err) {
-      return false;
-    });
-  }
+  AssetsAudioPlayer player;
 
   setVolume(double volume) {
     if (player != null)
@@ -37,28 +19,26 @@ class PlayingNowProvider extends ChangeNotifier {
 
   seekTo(Duration newDuration) async {
     if (player != null) {
-      if (player.isPlaying || player.isPaused) {
-        player.seekToPlayer(newDuration).then((value) => notifyListeners);
+      if (player.playerState.value != PlayerState.stop) {
+        player.seek(newDuration).then((value) => notifyListeners);
       } else {}
     }
   }
 
   forward(Duration forwardBy) async {
     if (player != null) {
-      if (player.isPlaying || player.isPaused) {
-        player
-            .seekToPlayer(duration + forwardBy)
-            .then((value) => notifyListeners);
+      if (player.playerState.value != PlayerState.stop) {
+        player.seekBy(forwardBy).then((value) => notifyListeners);
       } else {}
     }
   }
 
   rewind(Duration rewindBy) async {
     if (player != null) {
-      Duration result = (duration - rewindBy);
-      if (player.isPlaying || player.isPaused) {
+      Duration result = (player.currentPosition.value - rewindBy);
+      if (player.playerState.value != PlayerState.stop) {
         player
-            .seekToPlayer(result.inMilliseconds < 0 ? 0 : result)
+            .seek(result.inMilliseconds < 0 ? 0 : result)
             .then((value) => notifyListeners());
       } else {}
     }
@@ -90,34 +70,30 @@ class PlayingNowProvider extends ChangeNotifier {
 
   Future<void> stopPlayer() async {
     if (player != null) {
-      await pausePlayer().then((value) {
-        position = Duration.zero;
+      await player.pause().then((value) {
         notifyListeners();
       });
     }
   }
 
   Future<void> play() async {
-    await player
-        .startPlayer(
-            fromURI: state.playlist.bayans[state.bayanIndex].link,
-            whenFinished: () {
-              notifyListeners();
-            })
-        .then((value) => duration = value);
+    await player.open(
+      Audio.liveStream(_state.playlist.bayans[_state.bayanIndex].link),
+      autoStart: true,
+      showNotification: true,
+    );
+
     notifyListeners();
   }
 
-  pausePlayer() async {
+  pausePlayPlayer() async {
     if (player != null) {
-      await player.pausePlayer();
+      await player.pause;
     }
   }
 
   startPausePlayer() {
-    player.isPlaying
-        ? pausePlayer().then((value) => notifyListeners())
-        : play().then((value) => notifyListeners);
+    player.playOrPause().then((value) => notifyListeners());
   }
 
   set state(PlayingNowState pState) {

@@ -27,7 +27,7 @@ class MySQLiteDatabase {
     String path = join(await getDatabasesPath(), "myDb");
     database = await openDatabase(
       path,
-      version: 4,
+      version: 1,
       onCreate: onCreate,
       onUpgrade: onUpgrade,
       onDowngrade: onDowngrade,

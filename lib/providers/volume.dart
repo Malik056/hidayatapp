@@ -5,16 +5,21 @@ class VolumeProvider extends ChangeNotifier {
   double _volume = 0;
   double maxVolume = 100;
   static const double STEP = 5;
-
+  Future initialize;
   VolumeProvider() {
+    try {
+      initialize = VolumeWatcher.getMaxVolume.then((value) async {
+        maxVolume = value;
+        await VolumeWatcher.getCurrentVolume.then((value) {
+          volume = value;
+        });
+      });
+    } catch (ex) {
+      print(ex);
+      print("Failed to get Max Volume");
+    }
     VolumeWatcher(
       onVolumeChangeListener: (value) async {
-        try {
-          maxVolume = await VolumeWatcher.getMaxVolume;
-        } catch (ex) {
-          print(ex);
-          print("Failed to get Max Volume");
-        }
         _volume = value;
         notifyListeners();
       },

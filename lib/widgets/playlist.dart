@@ -21,6 +21,11 @@ class PlaylistWidget extends StatelessWidget {
         ));
       },
       child: Container(
+        decoration: ShapeDecoration(
+            color: Colors.black45,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            )),
         child: Stack(
           alignment: Alignment.center,
           fit: StackFit.expand,

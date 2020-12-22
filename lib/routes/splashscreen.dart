@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hidayat/database/database.dart';
 import 'package:hidayat/providers/connectivity.dart';
+import 'package:hidayat/providers/volume.dart';
 import 'package:hidayat/routes/mainroute.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +27,12 @@ class SplashScreen extends StatelessWidget {
             Spacer(),
             Builder(
               builder: (context) {
-                Provider.of<ConnectivityProvider>(context)
+                Provider.of<ConnectivityProvider>(context, listen: false)
                     .initialize
                     .then((value) async {
                   await MySQLiteDatabase.getInstance().init();
+                  await Provider.of<VolumeProvider>(context, listen: false)
+                      .initialize;
                   await Future.delayed(Duration(seconds: 2));
                   Navigator.pushReplacement(
                     context,
