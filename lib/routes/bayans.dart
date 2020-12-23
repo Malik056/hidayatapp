@@ -82,72 +82,14 @@ class BayansRoute extends StatelessWidget {
                                             Provider.of<PlayingNowProvider>(
                                                 context,
                                                 listen: false);
-                                        // provider.state =
-                                        var abc = PlayingNowState();
-                                        abc.playlist = playlist;
-                                        abc.bayanIndex = index;
-                                        provider.state = abc;
-                                        provider.player.open(
-                                          audio_player.Playlist(
-                                            audios: playlist.bayans
-                                                .map(
-                                                  (e) => audio_player.Audio
-                                                      .network(e.link),
-                                                )
-                                                .toList(),
-                                          ),
-                                          autoStart: false,
-                                        );
-                                        provider.player
-                                            .playlistPlayAtIndex(index);
 
-                                        // if (!(AudioService.running ?? false)) {
-                                        //   await AudioService.start(
-                                        //       backgroundTaskEntrypoint:
-                                        //           entrypoint);
-                                        // }
-                                        // AudioService.customAction(
-                                        //     "updatePlaylist", {
-                                        //   "playlist": jsonEncode(
-                                        //       Map<String, dynamic>.from(
-                                        //           playlist.toJson())),
-                                        //   "bayans": jsonEncode(playlist.bayans
-                                        //       .map<Map<String, dynamic>>((e) =>
-                                        //           Map<String, dynamic>.from(
-                                        //               e.toJson()))
-                                        //       .toList()),
-                                        //   "index": index,
-                                        // }).then((value) {
-                                        //   var state = PlayingNowState();
-                                        //   state.playlist = playlist;
-                                        //   state.bayanIndex = index;
-                                        //   state.duration =
-                                        //       Duration(seconds: value ?? 0);
-                                        //   Provider.of<PlayingNowProvider>(
-                                        //           context,
-                                        //           listen: false)
-                                        //       .state = state;
-                                        // });
-                                        // var state =
-                                        //     Provider.of<PlayingNowProvider>(
-                                        //             context,
-                                        //             listen: false)
-                                        //         .state;
-                                        // if (state.playlist == null ||
-                                        //     state.playlist.id != playlist.id ||
-                                        //     state.bayanIndex != index) {
-                                        //   PlayingNowState newState =
-                                        //       PlayingNowState();
-                                        //   newState.playlist = playlist;
-                                        //   newState.bayanIndex = index;
-                                        //   PlayingNowProvider provider =
-                                        //       Provider.of<PlayingNowProvider>(
-                                        //     context,
-                                        //     listen: false,
-                                        //   );
-                                        //   provider.state = newState;
-                                        //   provider.play();
-                                        // } else {}
+                                        provider.addPlaylist(
+                                            playlist.bayans
+                                                .map((e) => audio_player.Audio
+                                                    .liveStream(e.link))
+                                                .toList(),
+                                            index,
+                                            playlist);
                                       },
                                       child: Container(
                                         height: 40,

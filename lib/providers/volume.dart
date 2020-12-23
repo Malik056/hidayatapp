@@ -3,13 +3,14 @@ import 'package:volume_watcher/volume_watcher.dart';
 
 class VolumeProvider extends ChangeNotifier {
   double _volume = 0;
-  double maxVolume = 100;
-  static const double STEP = 5;
+  double maxVolume = 1;
+  static const double STEP = 0.2;
   Future initialize;
   VolumeProvider() {
     try {
       initialize = VolumeWatcher.getMaxVolume.then((value) async {
         maxVolume = value;
+        notifyListeners();
         await VolumeWatcher.getCurrentVolume.then((value) {
           volume = value;
         });

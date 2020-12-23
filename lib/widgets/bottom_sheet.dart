@@ -1,6 +1,7 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:hidayat/models/bayan.dart';
-import 'package:hidayat/models/playlist.dart';
+import 'package:hidayat/models/playlist.dart' as myPlaylist;
 import 'package:hidayat/providers/current_playing.dart';
 import 'package:hidayat/providers/volume.dart';
 import 'package:provider/provider.dart';
@@ -11,15 +12,12 @@ class MediaPlayerSheet extends StatefulWidget {
 }
 
 class _MediaPlayerSheetState extends State<MediaPlayerSheet> {
-  double sliderValue = 0;
-  double volume = 100;
-
   @override
   Widget build(BuildContext context) {
     // var textTheme = Theme.of(context).textTheme;
     return Consumer<PlayingNowProvider>(
       builder: (ctx, data, _) {
-        Playlist playlist = data.state?.playlist;
+        myPlaylist.Playlist playlist = data.state?.playlist;
         Bayan bayan;
         if (playlist != null &&
             playlist.bayans != null &&
@@ -34,7 +32,11 @@ class _MediaPlayerSheetState extends State<MediaPlayerSheet> {
         if (bayan == null) {
           return _PlayerSheet(
             position: Duration.zero,
-            playing: false,
+            volume: data.getVolume(),
+            audioState: data.state.audioState,
+            onVolumeUpdate: (value) {
+              data.setVolume(value);
+            },
             duration: Duration.zero,
             playlistName: "No Playlist Selected",
             bayanName: "No Audio Selected",
@@ -51,19 +53,28 @@ class _MediaPlayerSheetState extends State<MediaPlayerSheet> {
         if (data?.state?.bayanIndex == null || bayan == null) {
           return _PlayerSheet(
             position: Duration.zero,
-            playing: false,
+            audioState: data.state.audioState,
+            volume: data.getVolume(),
+            onVolumeUpdate: (value) {
+              data.setVolume(value);
+            },
             duration: Duration.zero,
             playlistName: "No Playlist Selected",
             bayanName: "No Audio Selected",
           );
         }
 
-        Duration position = data.player.currentPosition.value;
+        Duration position = data.player.currentPosition.value ?? Duration.zero;
 
         return _PlayerSheet(
           position: position,
-          duration: null,
-          playing: data.player.isPlaying.value,
+          playlistName: playlist.name,
+          volume: data.getVolume(),
+          duration: data.state.duration ?? Duration.zero,
+          onVolumeUpdate: (value) {
+            data.setVolume(value);
+          },
+          audioState: data.state.audioState,
           bayanName: "${index + 1}. ${bayan.name ?? "Anonymous"}",
           onPlayPressed: () {
             data.player.playOrPause();
@@ -134,7 +145,7 @@ class _MediaPlayerSheetState extends State<MediaPlayerSheet> {
 }
 
 class _PlayerSheet extends StatelessWidget {
-  final bool playing;
+  final AudioState audioState;
   final Duration position;
   final String bayanName;
   final String playlistName;
@@ -146,20 +157,22 @@ class _PlayerSheet extends StatelessWidget {
   final Function() onSkipPrevious;
   final Function(Duration) seekTo;
   final Function(double) onVolumeUpdate;
+  final double volume;
 
   const _PlayerSheet({
     Key key,
-    this.playing,
+    @required this.audioState,
     this.position,
     this.bayanName,
-    this.playlistName,
+    @required this.playlistName,
     this.duration,
     this.onPlayPressed,
     this.onSeekBackward,
     this.onSeekForward,
     this.onSkipNext,
+    @required this.volume,
     this.seekTo,
-    this.onVolumeUpdate,
+    @required this.onVolumeUpdate,
     this.onSkipPrevious,
   }) : super(key: key);
 
@@ -180,14 +193,18 @@ class _PlayerSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Slider(
-            value: position.inSeconds.toDouble(),
+            value: position.inSeconds > duration.inSeconds
+                ? duration.inSeconds.toDouble()
+                : position.inSeconds.toDouble(),
             max: duration.inSeconds.toDouble(),
             min: 0,
             onChanged: (value) {
               seekTo(Duration(seconds: value.toInt()));
             },
           ),
-          Text(getTimeFromDuration(position)),
+          audioState == AudioState.play
+              ? Text(getTimeFromDuration(position))
+              : Text("0:00"),
           SizedBox(height: 10),
           Text(
             '$bayanName',
@@ -209,10 +226,20 @@ class _PlayerSheet extends StatelessWidget {
                 onPressed: onSkipPrevious,
               ),
               Spacer(),
-              IconButton(
-                icon: Icon(playing ? Icons.pause : Icons.play_arrow),
-                onPressed: onPlayPressed,
-              ),
+              AudioState.loading == audioState
+                  ? IconButton(
+                      onPressed: null,
+                      icon: AspectRatio(
+                        aspectRatio: 1.0,
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : IconButton(
+                      icon: Icon(audioState == AudioState.play
+                          ? Icons.pause
+                          : Icons.play_arrow),
+                      onPressed: onPlayPressed,
+                    ),
               Spacer(),
               IconButton(
                 icon: Icon(Icons.fast_forward),
@@ -224,47 +251,49 @@ class _PlayerSheet extends StatelessWidget {
           SizedBox(height: 20),
           Align(
             alignment: Alignment.center,
-            child: Consumer<VolumeProvider>(
-              builder: (ctx, volume, _) => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.volume_down),
+            child:
+                // Consumer<VolumeProvider>(
+                //   builder: (ctx, volume, _) =>
+                Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.volume_down),
+                  onPressed: () {
+                    double vol = volume;
+                    vol -= VolumeProvider.STEP;
+                    if (vol < 0) {
+                      vol = 0;
+                    }
+                    // volume = vol;
+                    onVolumeUpdate(vol);
+                  },
+                ),
+                SizedBox(width: 4),
+                Slider(
+                  value: volume,
+                  min: 0,
+                  max: 1.0,
+                  onChanged: (value) {
+                    // volume.volume = value;
+                    onVolumeUpdate(value);
+                  },
+                ),
+                SizedBox(width: 4),
+                IconButton(
+                    icon: Icon(Icons.volume_up),
                     onPressed: () {
-                      double vol = volume.volume;
-                      vol -= VolumeProvider.STEP;
-                      if (vol < 0) {
-                        vol = 0;
+                      double vol = volume;
+                      vol += VolumeProvider.STEP;
+                      if (vol > 1.0) {
+                        vol = 1.0;
                       }
-                      volume.volume = vol;
+                      // volume.volume = vol;
                       onVolumeUpdate(vol);
-                    },
-                  ),
-                  SizedBox(width: 4),
-                  Slider(
-                    value: volume.volume,
-                    min: 0,
-                    max: volume.maxVolume ?? 1.0,
-                    onChanged: (value) {
-                      volume.volume = value;
-                      onVolumeUpdate(value);
-                    },
-                  ),
-                  SizedBox(width: 4),
-                  IconButton(
-                      icon: Icon(Icons.volume_up),
-                      onPressed: () {
-                        double vol = volume.volume;
-                        vol += VolumeProvider.STEP;
-                        if (vol > volume.maxVolume) {
-                          vol = volume.maxVolume;
-                        }
-                        volume.volume = vol;
-                        onVolumeUpdate(vol);
-                      }),
-                ],
-              ),
+                    }),
+              ],
             ),
+            // ),
           ),
         ],
       ),

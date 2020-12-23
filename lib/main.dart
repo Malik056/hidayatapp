@@ -1,17 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hidayat/providers/current_playing.dart';
 import 'package:hidayat/providers/volume.dart';
 import 'package:hidayat/routes/mainroute.dart';
 import 'package:hidayat/routes/splashscreen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './globals/config.dart' as globals;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   if (FirebaseAuth.instance.currentUser == null) {
     FirebaseAuth.instance.signInAnonymously();
+  }
+  await FlutterDownloader.initialize(
+      debug: true // optional: set false to disable printing logs to console
+      );
+  var prefs = await SharedPreferences.getInstance();
+
+  try {
+    var volume = prefs.getDouble("volume");
+    globals.volume = volume ?? globals.volume;
+  } catch (ex) {
+    print(ex?.toString() ?? '');
   }
   runApp(MyApp());
 }

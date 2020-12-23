@@ -20,34 +20,35 @@ class MainRoute extends StatelessWidget {
       child: Scaffold(
         key: _scaffoldKey,
         drawer: Consumer<CategoriesProvider>(
-          builder: (ctx, snapshot, _) => Container(
-            width: 120,
-            child: Drawer(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    UserAccountsDrawerHeader(
-                      accountName: Text(''),
-                      accountEmail: Text(''),
+          builder: (ctx, snapshot, _) => Drawer(
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  UserAccountsDrawerHeader(
+                    accountName: Text(''),
+                    accountEmail: Text(''),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        alignment: Alignment.center,
+                        fit: BoxFit.cover,
+                        image: AssetImage('images/placeholder_playlist.jpg'),
+                      ),
                     ),
-                    SizedBox(height: kToolbarHeight)
-                  ]..addAll(
-                      List.generate(
-                          snapshot.state.length,
-                          (index) => Card(
-                                margin: EdgeInsets.zero,
-                                child: ListTile(
-                                  title: Text(snapshot.state[index].name),
-                                  onTap: () {
-                                    controller.animateToPage(index,
-                                        duration: Duration(milliseconds: 200),
-                                        curve: Curves.decelerate);
-                                  },
-                                ),
-                              )),
-                    ),
-                ),
+                  ),
+                  SizedBox(height: kToolbarHeight)
+                ]..addAll(
+                    List.generate(
+                        snapshot.state.length,
+                        (index) => ListTile(
+                              title: Text(snapshot.state[index].name),
+                              onTap: () {
+                                controller.animateToPage(index,
+                                    duration: Duration(milliseconds: 200),
+                                    curve: Curves.decelerate);
+                              },
+                            )),
+                  ),
               ),
             ),
           ),

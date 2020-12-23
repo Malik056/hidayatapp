@@ -18,25 +18,25 @@ class _MediaPlayerBarWidgetState extends State<MediaPlayerBarWidget> {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
     return Consumer<PlayingNowProvider>(builder: (ctx, providerData, _) {
+      print(providerData.state.audioState);
       if (providerData.state == null ||
           providerData.state.playlist?.bayans == null ||
-          providerData.state.playlist.bayans.isEmpty) {
+          providerData.state.playlist.bayans.isEmpty ||
+          providerData.state.audioState == AudioState.none) {
         return _Player(
           bayanName: "No Audio File",
           position: Duration.zero,
-          playing: false,
+          state: providerData?.state?.audioState ?? AudioState.none,
         );
       }
 
       my_playlist.Playlist playlist = providerData.state.playlist;
       Bayan bayan = playlist.bayans[providerData.state.bayanIndex];
-      bool playing = providerData.player.isPlaying.value;
-      print("playing: $playing");
       Duration position =
           providerData.player.currentPosition.value ?? Duration.zero;
       return _Player(
         bayanName: bayan.name,
-        playing: playing,
+        state: providerData.state.audioState,
         onSeekForward: () {
           // var newDuration = position + Duration(seconds: 15);
           providerData.forward(Duration(seconds: 15));
@@ -53,7 +53,7 @@ class _MediaPlayerBarWidgetState extends State<MediaPlayerBarWidget> {
         },
         position: position,
         onPlayPressed: () {
-          providerData.pausePlayPlayer();
+          providerData.startPausePlayer();
           // if (playing) {
           //   AudioService.pause();
           // } else {
@@ -71,7 +71,7 @@ class _Player extends StatelessWidget {
   final Function() onPlayPressed;
   final Function() onSeekBackward;
   final Function() onSeekForward;
-  final bool playing;
+  final AudioState state;
 
   const _Player(
       {Key key,
@@ -80,7 +80,7 @@ class _Player extends StatelessWidget {
       this.onPlayPressed,
       this.onSeekBackward,
       this.onSeekForward,
-      this.playing})
+      this.state})
       : super(key: key);
 
   @override
@@ -101,14 +101,25 @@ class _Player extends StatelessWidget {
                 blankSpace: 200,
               ),
             ),
-            IconButton(
-              icon: Icon(Icons.replay_10),
-              onPressed: onSeekBackward,
-            ),
-            IconButton(
-                icon: Icon(playing ? Icons.pause : Icons.play_arrow),
-                onPressed: onPlayPressed),
-            IconButton(icon: Icon(Icons.forward_10), onPressed: onSeekForward),
+            if (state != AudioState.none)
+              IconButton(
+                icon: Icon(Icons.replay_10),
+                onPressed: onSeekBackward,
+              ),
+            if (state != AudioState.none)
+              IconButton(
+                  icon: state == AudioState.loading
+                      ? AspectRatio(
+                          child: CircularProgressIndicator(),
+                          aspectRatio: 1.0,
+                        )
+                      : Icon(state == AudioState.play
+                          ? Icons.pause
+                          : Icons.play_arrow),
+                  onPressed: onPlayPressed),
+            if (state != AudioState.none)
+              IconButton(
+                  icon: Icon(Icons.forward_10), onPressed: onSeekForward),
           ],
         ),
       ),
