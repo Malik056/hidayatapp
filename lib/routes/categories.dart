@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:hidayat/providers/categories.dart';
 import 'package:hidayat/providers/playlists.dart';
+import 'package:hidayat/providers/selectedCalegory.dart';
 import 'package:hidayat/widgets/playlist.dart';
 import 'package:provider/provider.dart';
 
@@ -47,7 +48,10 @@ class CategoryPage extends StatelessWidget {
             );
           }
           if (snapshot.state.isEmpty) {
-            return Center(child: Text("Unable to find anything :("));
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Center(child: Text("Unable to find anything :(")),
+            );
           }
           return Material(
             color: Colors.transparent,
@@ -71,6 +75,10 @@ class CategoryPage extends StatelessWidget {
                     physics: AlwaysScrollableScrollPhysics(),
                     controller: controller,
                     scrollDirection: Axis.vertical,
+                    onPageChanged: (index) {
+                      Provider.of<SelectedCategory>(context, listen: false)
+                          .current = index;
+                    },
                     children: List.generate(
                       snapshot.state.length,
                       (index) {
@@ -109,12 +117,14 @@ class CategoryPage extends StatelessWidget {
                                             value.state;
                                         return Swiper.list(
                                           loop: false,
+                                          curve: Curves.linear,
                                           viewportFraction: 0.75,
                                           scale: 0.8,
                                           controller: _horizontalController,
                                           transformer: ScaleAndFadeTransformer(
                                               scale: 0.5),
                                           scrollDirection: Axis.horizontal,
+                                          duration: 1,
                                           list: value.state,
                                           builder: (context, data, index) {
                                             return PlaylistWidget(

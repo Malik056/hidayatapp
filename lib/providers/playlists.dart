@@ -17,10 +17,12 @@ class PlaylistsProvider extends ChangeNotifier {
     _playlistsStreamController = StreamController();
     MySQLiteDatabase mySQLiteDatabase = MySQLiteDatabase.getInstance();
     mySQLiteDatabase.playlistDbHelper.getPlaylists(categoryId).then((value) {
-      state = value;
-      _playlistsStreamController.add(state);
-      connectionState = ConnectionState.active;
-      notifyListeners();
+      state = value ?? [];
+      if (state != null && state.isNotEmpty) {
+        _playlistsStreamController.add(state);
+        connectionState = ConnectionState.active;
+        notifyListeners();
+      }
 
       _querySnapshotStreamSubscription = FirebaseFirestore.instance
           .collection("playlists")
@@ -28,13 +30,7 @@ class PlaylistsProvider extends ChangeNotifier {
           .snapshots()
           .listen((event) async {
         error = null;
-        // await mySQLiteDatabase.playlistDbHelper.clearPlaylists(categoryId);
-        if (connectionState != ConnectionState.active) {
-          connectionState = ConnectionState.active;
-        }
-        // state = event.docs.map((e) => Playlist.fromSnapshot(e)).toList();
-        List<Playlist> tempState = [];
-
+        connectionState = ConnectionState.active;
         event.docChanges.forEach((element) {
           Playlist playlist = Playlist.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
@@ -44,30 +40,24 @@ class PlaylistsProvider extends ChangeNotifier {
             });
             if (playlistLocal == null) {
               mySQLiteDatabase.playlistDbHelper.addPlaylist(playlist);
+              state.add(playlist);
             } else if (!playlistLocal.equals(playlist)) {
               mySQLiteDatabase.playlistDbHelper.updatePlaylist(playlist);
+              state.removeWhere((e) => e.id == playlist.id);
+              state.add(playlist);
             }
-            tempState.add(playlist);
           } else if (element.type == DocumentChangeType.modified) {
             mySQLiteDatabase.playlistDbHelper.updatePlaylist(playlist);
-            tempState.add(playlist);
+            state.removeWhere((e) => e.id == playlist.id);
+            state.add(playlist);
           } else if (element.type == DocumentChangeType.removed) {
             mySQLiteDatabase.playlistDbHelper.deletePlaylist(playlist.id);
+            state.removeWhere((e) => e.id == playlist.id);
           }
         });
 
-        if (state == null ||
-            state.isEmpty ||
-            state.length != tempState.length) {
-          state = tempState;
-        } else {
-          for (int i = 0; i < state.length; i++) {
-            if (!state[i].equals(tempState[i])) {
-              state = tempState;
-              break;
-            }
-          }
-        }
+        if (state == null) state = [];
+
         _playlistsStreamController.add(state);
         notifyListeners();
       }, onError: (err) {

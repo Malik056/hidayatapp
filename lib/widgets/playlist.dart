@@ -70,7 +70,7 @@ class PlaylistWidget extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    "This is description of this playlist, igone this beharvious",
+                    playlist.description ?? '',
                     textAlign: TextAlign.start,
                     style: theme.bodyText2.copyWith(color: Colors.white),
                   ),

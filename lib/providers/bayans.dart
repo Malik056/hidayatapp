@@ -18,9 +18,11 @@ class BayansProvider extends ChangeNotifier {
     MySQLiteDatabase mySQLiteDatabase = MySQLiteDatabase.getInstance();
     mySQLiteDatabase.bayanDbHelper.getBayans(playlistId).then((value) {
       state = value;
-      _bayansStreamController.add(state);
-      connectionState = ConnectionState.active;
-      notifyListeners();
+      if (state != null && state.isNotEmpty) {
+        _bayansStreamController.add(state);
+        connectionState = ConnectionState.active;
+        notifyListeners();
+      }
 
       _querySnapshotStreamSubscription = FirebaseFirestore.instance
           .collection("bayans")
@@ -29,12 +31,9 @@ class BayansProvider extends ChangeNotifier {
           .listen((event) async {
         error = null;
         // await mySQLiteDatabase.bayanDbHelper.clearBayans(bayanId);
-        if (connectionState != ConnectionState.active) {
-          connectionState = ConnectionState.active;
-        }
         // state = event.docs.map((e) => Bayan.fromSnapshot(e)).toList();
-        List<Bayan> tempState = [];
-
+        // List<Bayan> tempState = [];
+        connectionState = ConnectionState.active;
         event.docChanges.forEach((element) {
           Bayan bayan = Bayan.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
@@ -44,29 +43,24 @@ class BayansProvider extends ChangeNotifier {
             });
             if (bayanLocal == null) {
               mySQLiteDatabase.bayanDbHelper.addBayan(bayan);
+              state.add(bayan);
             } else if (!bayanLocal.equals(bayan)) {
               mySQLiteDatabase.bayanDbHelper.updateBayan(bayan);
+              state.removeWhere((_) => _.id == bayan.id);
+              state.add(bayan);
             }
-            tempState.add(bayan);
           } else if (element.type == DocumentChangeType.modified) {
             mySQLiteDatabase.bayanDbHelper.updateBayan(bayan);
-            tempState.add(bayan);
+            state.removeWhere((e) => e.id == bayan.id);
+            state.add(bayan);
           } else if (element.type == DocumentChangeType.removed) {
             mySQLiteDatabase.bayanDbHelper.deleteBayan(element.doc.id);
+            state.removeWhere((_) => _.id == bayan.id);
           }
         });
-        if (state == null ||
-            state.isEmpty ||
-            state.length != tempState.length) {
-          state = tempState;
-        } else {
-          for (int i = 0; i < state.length; i++) {
-            if (!state[i].equals(tempState[i])) {
-              state = tempState;
-              break;
-            }
-          }
-        }
+        if (state == null) {
+          state = [];
+        } else {}
         _bayansStreamController.add(state);
         notifyListeners();
       }, onError: (_) {

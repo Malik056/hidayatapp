@@ -19,10 +19,12 @@ class CategoriesProvider extends ChangeNotifier {
       // if (value == null || value.isEmpty) {
       //   return;
       // }
-      state = value;
-      _categoriesStreamController.add(state);
-      connectionState = ConnectionState.active;
-      notifyListeners();
+      state = value ?? [];
+      if (state != null && state.isNotEmpty) {
+        _categoriesStreamController.add(state);
+        connectionState = ConnectionState.active;
+        notifyListeners();
+      }
 
       _querySnapshotStreamSubscription = FirebaseFirestore.instance
           .collection("categories")
@@ -30,12 +32,8 @@ class CategoriesProvider extends ChangeNotifier {
           .listen((event) async {
         error = null;
         // await mySQLiteDatabase.categoryDbHelper.clearCategories(categoryId);
-        if (connectionState != ConnectionState.active) {
-          connectionState = ConnectionState.active;
-        }
+        connectionState = ConnectionState.active;
         // state = event.docs.map((e) => Category.fromSnapshot(e)).toList();
-        List<Category> tempState = [];
-
         event.docChanges.forEach((element) {
           Category category = Category.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
@@ -45,29 +43,22 @@ class CategoriesProvider extends ChangeNotifier {
             });
             if (categoryLocal == null) {
               mySQLiteDatabase.categoryDbHelper.addCategory(category);
+              state.add(category);
             } else if (!categoryLocal.equals(category)) {
               mySQLiteDatabase.categoryDbHelper.updateCategory(category);
+              state.removeWhere((_) => _.id == category.id);
+              state.add(category);
             }
-            tempState.add(category);
           } else if (element.type == DocumentChangeType.modified) {
             mySQLiteDatabase.categoryDbHelper.updateCategory(category);
-            tempState.add(category);
+            state.removeWhere((_) => _.id == category.id);
+            state.add(category);
           } else if (element.type == DocumentChangeType.removed) {
             mySQLiteDatabase.categoryDbHelper.deleteCategory(category.id);
+            state.removeWhere((_) => _.id == category.id);
           }
         });
-        if (state == null ||
-            state.isEmpty ||
-            state.length != tempState.length) {
-          state = tempState;
-        } else {
-          for (int i = 0; i < state.length; i++) {
-            if (!state[i].equals(tempState[i])) {
-              state = tempState;
-              break;
-            }
-          }
-        }
+        if (state == null) state = [];
         _categoriesStreamController.add(state);
         notifyListeners();
       }, onError: (err) {
