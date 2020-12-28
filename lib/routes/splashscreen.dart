@@ -7,48 +7,50 @@ import 'package:hidayat/routes/mainroute.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatelessWidget {
+  initializeAndReroute(BuildContext context) async {
+    Provider.of<ConnectivityProvider>(context, listen: false)
+        .initialize
+        .then((value) async {
+      await MySQLiteDatabase.getInstance().init();
+      await Provider.of<VolumeProvider>(context, listen: false).initialize;
+      await Future.delayed(Duration(seconds: 2));
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        Navigator.pushReplacement(
+          context,
+          CupertinoPageRoute(
+            builder: (context) {
+              return MainRoute();
+            },
+          ),
+        );
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ChangeNotifierProvider(
-        create: (context) => ConnectivityProvider(),
-        child: Center(
-            child: Column(
-          children: [
-            Spacer(),
-            Image.asset(
-              'images/logo.png',
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width * 0.4,
-            ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
-            Spacer(),
-            Builder(
-              builder: (context) {
-                Provider.of<ConnectivityProvider>(context, listen: false)
-                    .initialize
-                    .then((value) async {
-                  await MySQLiteDatabase.getInstance().init();
-                  await Provider.of<VolumeProvider>(context, listen: false)
-                      .initialize;
-                  await Future.delayed(Duration(seconds: 2));
-                  Navigator.pushReplacement(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) {
-                        return MainRoute();
-                      },
-                    ),
-                  );
-                });
-                return Container();
-              },
-            ),
-          ],
-        )),
-      ),
+      body: Center(
+          child: Column(
+        children: [
+          Spacer(),
+          Image.asset(
+            'images/logo.png',
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width * 0.4,
+          ),
+          SizedBox(height: 20),
+          CircularProgressIndicator(),
+          Spacer(),
+          FutureBuilder(
+            future: initializeAndReroute(context),
+            builder: (context, ss) {
+              return Container();
+            },
+          ),
+        ],
+      )),
     );
   }
 }

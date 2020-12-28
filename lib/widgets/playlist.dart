@@ -40,13 +40,13 @@ class PlaylistWidget extends StatelessWidget {
                   print(error);
                   return Image.asset(
                     'images/placeholder_playlist.jpg',
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.cover,
                   );
                 },
                 placeholder: (context, url) {
                   return Image.asset(
                     'images/placeholder_playlist.jpg',
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.cover,
                   );
                 },
                 fit: BoxFit.fitHeight,

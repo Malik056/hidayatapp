@@ -3,13 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hidayat/providers/current_playing.dart';
+
 import 'package:hidayat/providers/selectedCalegory.dart';
 import 'package:hidayat/providers/volume.dart';
-import 'package:hidayat/routes/mainroute.dart';
 import 'package:hidayat/routes/splashscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './globals/config.dart' as globals;
+import 'providers/connectivity.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => PlayingNowProvider()),
         ChangeNotifierProvider(create: (ctx) => VolumeProvider()),
         ChangeNotifierProvider(create: (ctx) => SelectedCategory()),
+        ChangeNotifierProvider(create: (ctx) => ConnectivityProvider()),
       ],
       child: MaterialApp(
         title: 'Hidoyaat',

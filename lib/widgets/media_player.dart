@@ -57,9 +57,10 @@ class _Player extends StatelessWidget {
                   ),
                   IconButton(
                     icon: Icon(Icons.replay_10),
-                    onPressed: state == PlayerState.stop
-                        ? null
-                        : () => data.rewind(Duration(seconds: 10)),
+                    onPressed:
+                        (state == PlayerState.stop || !data.isPlayerReady)
+                            ? null
+                            : () => data.rewind(Duration(seconds: 10)),
                   ),
                   IconButton(
                     icon: Icon(
@@ -68,15 +69,18 @@ class _Player extends StatelessWidget {
                           : Icons.play_arrow,
                     ),
                     onPressed:
-                        state == PlayerState.stop ? null : data.togglePlayback,
+                        (state == PlayerState.stop || !data.isPlayerReady)
+                            ? null
+                            : data.togglePlayback,
                   ),
                   IconButton(
                     icon: Icon(Icons.forward_10),
-                    onPressed: state == PlayerState.stop
-                        ? null
-                        : () => data.forward(
-                              Duration(seconds: 10),
-                            ),
+                    onPressed:
+                        (state == PlayerState.stop || !data.isPlayerReady)
+                            ? null
+                            : () => data.forward(
+                                  Duration(seconds: 10),
+                                ),
                   ),
                 ],
               );

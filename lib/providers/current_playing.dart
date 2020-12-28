@@ -1,33 +1,53 @@
+import 'dart:async';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../globals/config.dart' as globals;
 import 'package:hidayat/models/playlist.dart' as myPlaylist;
 
-enum AudioState { loading, none, pause, play }
+// enum AudioState { loading, none, pause, play }
 
-class PlayingNowState {
-  myPlaylist.Playlist playlist;
-  int bayanIndex;
-  Duration duration;
-  Duration position;
-  AudioState audioState = AudioState.none;
-}
+// class PlayingNowState {
+//   myPlaylist.Playlist playlist;
+//   int bayanIndex;
+//   Duration duration;
+//   Duration position;
+//   // AudioState audioState = AudioState.none;
+// }
 
 class PlayingNowProvider extends ChangeNotifier {
   // PlayingNowState _state = PlayingNowState();
   AssetsAudioPlayer _player;
-
+  bool _isReady = false;
   PlayerState get playerState => _player?.playerState?.value;
-
+  StreamSubscription<PlayingAudio> _subscription;
   Stream<PlayerState> get playerStateStream =>
       _player?.playerState?.asBroadcastStream();
 
   String get id => _player?.current?.value?.audio?.audio?.metas?.id;
 
+  bool get isPlayerReady => _isReady;
+
   Duration get position => _player?.currentPosition?.value;
 
   int get fileIndex => _player?.current?.value?.index;
+
+  String get playlistId {
+    String id = (_player?.current?.value?.audio?.audio?.metas?.extra ??
+        {})['playlistId'];
+    return id;
+  }
+
+  Future<void> playAtIndex(int index) async {
+    if (_isReady) {
+      _isReady = false;
+      await _player?.pause();
+      notifyListeners();
+      await _player?.playlistPlayAtIndex(index);
+      _isReady = true;
+    }
+  }
 
   String get playlistName {
     String album = _player?.current?.value?.audio?.audio?.metas?.album;
@@ -49,21 +69,60 @@ class PlayingNowProvider extends ChangeNotifier {
 
   Stream<double> get volumeStream => _player?.volume?.asBroadcastStream();
 
+  Future<void> _openNewPlayer(
+      List<Audio> audios, int startIndex, myPlaylist.Playlist playlist) async {
+    _isReady = false;
+    _player = AssetsAudioPlayer.newPlayer();
+    try {
+      await _player.open(
+        Playlist(
+          audios: audios,
+          startIndex: startIndex,
+        ),
+        autoStart: false,
+        loopMode: LoopMode.none,
+        showNotification: true,
+        volume: globals.volume,
+      );
+    } catch (ex) {
+      print(ex);
+    }
+    _subscription = _player.onReadyToPlay.listen((event) {
+      print("OpenNewPlayer On Ready To Play");
+      if (!(_player?.isPlaying?.value ?? true)) {
+        _player?.play();
+      }
+      if (_player != null && event != null && event.audio != null) {
+        _isReady = true;
+      }
+    });
+    _player.playlistFinished.listen((event) {
+      if (event != null && event) {
+        _player?.dispose();
+        _player = null;
+      }
+    });
+
+    notifyListeners();
+  }
+
   Future<void> addPlaylist(
       List<Audio> audios, int startIndex, myPlaylist.Playlist playlist) async {
-    await _player?.dispose();
-    _player = AssetsAudioPlayer.newPlayer();
-    _player.open(
-      Playlist(
-        audios: audios,
-        startIndex: startIndex,
-      ),
-      autoStart: true,
-      loopMode: LoopMode.none,
-      showNotification: true,
-      volume: globals.volume,
-    );
-    notifyListeners();
+    if (_player != null) {
+      await _subscription?.cancel();
+      if (_isReady) {
+        await _player.dispose();
+        await _openNewPlayer(audios, startIndex, playlist);
+      } else {
+        await _player.dispose();
+        await _openNewPlayer(audios, startIndex, playlist);
+        // await _player.onReadyToPlay.first.then((event) async {
+        //   print("Disposing On Ready To Play");
+        // });
+      }
+    } else {
+      _openNewPlayer(audios, startIndex, playlist);
+    }
   }
 
   Future<void> setVolume(double volume) async {
@@ -114,11 +173,21 @@ class PlayingNowProvider extends ChangeNotifier {
   }
 
   Future<void> next() async {
-    _player?.next(stopIfLast: true);
+    if (_isReady) {
+      _isReady = false;
+      await _player?.pause();
+      notifyListeners();
+      _player?.next(stopIfLast: true);
+    }
   }
 
   Future<void> previous() async {
-    _player?.previous();
+    if (_isReady) {
+      // _isReady = false;
+      // await _player?.pause();
+      notifyListeners();
+      _player?.previous();
+    }
   }
 
   Future<void> pause() async {

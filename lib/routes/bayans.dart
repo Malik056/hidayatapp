@@ -92,6 +92,15 @@ class BayansRoute extends StatelessWidget {
                                                       PlayingNowProvider>(
                                                   context,
                                                   listen: false);
+                                              if (playlist.bayans[index].id ==
+                                                  provider.id) {
+                                                return;
+                                              }
+                                              String pLId = provider.playlistId;
+                                              if (pLId == playlist.id) {
+                                                provider.playAtIndex(index);
+                                                return;
+                                              }
 
                                               provider.addPlaylist(
                                                   playlist.bayans
@@ -108,6 +117,8 @@ class BayansRoute extends StatelessWidget {
                                                             id: e.id,
                                                             extra: {
                                                               "index": index,
+                                                              "playlistId":
+                                                                  playlist.id,
                                                             },
                                                             image: ((playlist.image
                                                                             ?.isEmpty ??

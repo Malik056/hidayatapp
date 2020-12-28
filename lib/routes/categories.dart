@@ -1,17 +1,17 @@
 import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:hidayat/providers/categories.dart';
 import 'package:hidayat/providers/playlists.dart';
 import 'package:hidayat/providers/selectedCalegory.dart';
+import 'package:hidayat/scroll_physics/scroll_physics.dart';
 import 'package:hidayat/widgets/playlist.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 class CategoryPage extends StatelessWidget {
   static const String name = "CategoryPage";
-  final SwiperController _horizontalController = SwiperController();
+  final _horizontalController = SwiperController();
   PageController controller;
 
   CategoryPage(this.controller);
@@ -72,7 +72,7 @@ class CategoryPage extends StatelessWidget {
                 Expanded(
                   child: PageView(
                     pageSnapping: true,
-                    physics: AlwaysScrollableScrollPhysics(),
+                    physics: FastScrollPhysics(parent: BouncingScrollPhysics()),
                     controller: controller,
                     scrollDirection: Axis.vertical,
                     onPageChanged: (index) {
@@ -91,7 +91,7 @@ class CategoryPage extends StatelessWidget {
                                     .copyWith(color: Colors.white)),
                             Spacer(flex: 2),
                             Expanded(
-                              flex: 12,
+                              flex: 14,
                               child: Container(
                                 child:
                                     ChangeNotifierProvider<PlaylistsProvider>(
@@ -116,15 +116,36 @@ class CategoryPage extends StatelessWidget {
                                         snapshot.state[index].playlists =
                                             value.state;
                                         return Swiper.list(
-                                          loop: false,
-                                          curve: Curves.linear,
-                                          viewportFraction: 0.75,
-                                          scale: 0.8,
+                                          // items: List<Widget>.generate(
+                                          //   value.state.length,
+                                          //   (index) => PlaylistWidget(
+                                          //     playlist: value.state[index],
+                                          //   ),
+                                          // ),
+                                          outer: true,
                                           controller: _horizontalController,
-                                          transformer: ScaleAndFadeTransformer(
-                                              scale: 0.5),
+                                          // options: CarouselOptions(
+                                          //   height: MediaQuery.of(context)
+                                          //       .size
+                                          //       .height,
+                                          //   viewportFraction: 0.8,
+                                          //   scrollDirection: Axis.horizontal,
+                                          //   scrollPhysics: FastScrollPhysics(),
+                                          //   enableInfiniteScroll: false,
+                                          //   enlargeCenterPage: true,
+                                          //   enlargeStrategy:
+                                          //       CenterPageEnlargeStrategy.scale,
+                                          //   initialPage: 0,
+                                          // ),
+
+                                          // loop: false,
+                                          curve: Curves.linear,
+                                          viewportFraction: 0.7,
+                                          scale: 0.6,
+                                          physics: FastScrollPhysics(),
+                                          transformer:
+                                              ScaleAndFadeTransformer(),
                                           scrollDirection: Axis.horizontal,
-                                          duration: 1,
                                           list: value.state,
                                           builder: (context, data, index) {
                                             return PlaylistWidget(
@@ -138,13 +159,14 @@ class CategoryPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Spacer(flex: 6),
+                            Spacer(flex: 4),
                           ],
                         );
                       },
                     ),
                   ),
                 ),
+                SizedBox(height: kToolbarHeight),
               ],
             ),
           );

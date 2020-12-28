@@ -213,19 +213,22 @@ class _PlayerSheet extends StatelessWidget {
                               : position.inSeconds.toDouble(),
                           max: duration.inSeconds.toDouble(),
                           min: 0,
-                          onChanged: (value) {
-                            data.seekTo(Duration(seconds: value.toInt()));
-                          },
+                          onChanged: (state == PlayerState.stop ||
+                                  !data.isPlayerReady)
+                              ? null
+                              : (value) {
+                                  data.seekTo(Duration(seconds: value.toInt()));
+                                },
                         ),
                         Row(
                           children: [
-                            state != PlayerState.stop
-                                ? Text(getTimeFromDuration(position))
-                                : Text("0:00"),
+                            (state == PlayerState.stop || !data.isPlayerReady)
+                                ? Text("0:00")
+                                : Text(getTimeFromDuration(position)),
                             Spacer(),
-                            state != PlayerState.stop
-                                ? Text(getTimeFromDuration(duration))
-                                : Text("0:00"),
+                            (state == PlayerState.stop || !data.isPlayerReady)
+                                ? Text("0:00")
+                                : Text(getTimeFromDuration(duration)),
                           ],
                         ),
                       ],
@@ -252,21 +255,28 @@ class _PlayerSheet extends StatelessWidget {
                     Spacer(),
                     IconButton(
                       icon: Icon(Icons.fast_rewind),
-                      onPressed: data.previous,
+                      onPressed:
+                          (state == PlayerState.stop || !data.isPlayerReady)
+                              ? null
+                              : data.previous,
                     ),
                     Spacer(),
                     IconButton(
                       icon: Icon(state == PlayerState.play
                           ? Icons.pause
                           : Icons.play_arrow),
-                      onPressed: state == PlayerState.stop
-                          ? null
-                          : data.togglePlayback,
+                      onPressed:
+                          (state == PlayerState.stop || !data.isPlayerReady)
+                              ? null
+                              : data.togglePlayback,
                     ),
                     Spacer(),
                     IconButton(
                       icon: Icon(Icons.fast_forward),
-                      onPressed: data.next,
+                      onPressed:
+                          (state == PlayerState.stop || !data.isPlayerReady)
+                              ? null
+                              : data.next,
                     ),
                     Spacer(),
                   ],

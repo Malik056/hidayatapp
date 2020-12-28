@@ -30,7 +30,7 @@ class ConnectivityProvider extends ChangeNotifier {
   }
 
   Future<void> _initialize() async {
-    _connectivity.checkConnectivity().then((value) async {
+    await _connectivity.checkConnectivity().then((value) async {
       if (value != ConnectivityResult.none) {
         state = InternetConnectionState(value, await _isOnline());
       } else {
