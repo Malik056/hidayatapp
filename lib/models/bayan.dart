@@ -15,6 +15,10 @@ class Bayan {
   String playlistId;
   @JsonKey(defaultValue: "")
   String description;
+  @JsonKey(defaultValue: null)
+  String filePath;
+  @JsonKey(ignore: true)
+  double progress = 0;
 
   Bayan(this.id, this.link, this.name, this.description, this.playlistId);
   factory Bayan.fromJson(Map<String, dynamic> json) => _$BayanFromJson(json);
@@ -42,6 +46,7 @@ class Bayan {
     link TEXT NOT NULL,
     description TEXT,
     playlistId TEXT NOT NULL,
+    filePath TEXT,
     FOREIGN KEY (playlistId)
        REFERENCES ${Playlist.tableName} (id)
        ON DELETE CASCADE

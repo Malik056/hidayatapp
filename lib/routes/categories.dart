@@ -12,7 +12,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 class CategoryPage extends StatelessWidget {
   static const String name = "CategoryPage";
   final _horizontalController = SwiperController();
-  PageController controller;
+  final PageController controller;
 
   CategoryPage(this.controller);
 
@@ -122,7 +122,6 @@ class CategoryPage extends StatelessWidget {
                                           //     playlist: value.state[index],
                                           //   ),
                                           // ),
-                                          outer: true,
                                           controller: _horizontalController,
                                           // options: CarouselOptions(
                                           //   height: MediaQuery.of(context)
@@ -138,7 +137,7 @@ class CategoryPage extends StatelessWidget {
                                           //   initialPage: 0,
                                           // ),
 
-                                          // loop: false,
+                                          loop: false,
                                           curve: Curves.linear,
                                           viewportFraction: 0.7,
                                           scale: 0.6,

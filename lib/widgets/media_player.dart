@@ -15,6 +15,7 @@ class MediaPlayerBarWidget extends StatefulWidget {
 class _MediaPlayerBarWidgetState extends State<MediaPlayerBarWidget> {
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     var textTheme = Theme.of(context).textTheme;
     return Consumer<PlayingNowProvider>(builder: (ctx, providerData, _) {
       return _Player(data: providerData);

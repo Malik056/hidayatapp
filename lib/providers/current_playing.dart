@@ -82,7 +82,16 @@ class PlayingNowProvider extends ChangeNotifier {
         autoStart: false,
         loopMode: LoopMode.none,
         showNotification: true,
+        headPhoneStrategy: HeadPhoneStrategy.pauseOnUnplug,
         volume: globals.volume,
+        notificationSettings: NotificationSettings(
+          customNextAction: (player) async {
+            next();
+          },
+          customPrevAction: (player) {
+            previous();
+          },
+        ),
       );
     } catch (ex) {
       print(ex);
@@ -127,7 +136,7 @@ class PlayingNowProvider extends ChangeNotifier {
 
   Future<void> setVolume(double volume) async {
     if (_player != null) {
-      _player.setVolume(volume).then((value) async {
+      _player.setVolume(volume).then((_) async {
         globals.volume = volume;
         notifyListeners();
         await SharedPreferences.getInstance().then(

@@ -94,6 +94,7 @@ class BayansRoute extends StatelessWidget {
                                                   listen: false);
                                               if (playlist.bayans[index].id ==
                                                   provider.id) {
+                                                provider.togglePlayback();
                                                 return;
                                               }
                                               String pLId = provider.playlistId;
@@ -108,7 +109,7 @@ class BayansRoute extends StatelessWidget {
                                                         (e) => audio_player
                                                             .Audio.network(
                                                           e.link,
-                                                          cached: true,
+                                                          cached: false,
                                                           metas: audio_player
                                                               .Metas(
                                                             title: e.name,
