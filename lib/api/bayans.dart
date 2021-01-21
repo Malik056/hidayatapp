@@ -10,7 +10,8 @@ class BayanAPIs {
         StreamController<List<Bayan>>();
     var ref = FirebaseFirestore.instance
         .collection("bayans")
-        .where('playlistId', isEqualTo: playlist);
+        .where('playlistId', isEqualTo: playlist)
+        .orderBy('name');
     ref.snapshots().listen((event) {
       bayansStreamController.add(
         event.docs.map((e) => Bayan.fromSnapshot(e)).toList(),

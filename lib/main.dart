@@ -18,9 +18,14 @@ void main() async {
   if (FirebaseAuth.instance.currentUser == null) {
     FirebaseAuth.instance.signInAnonymously();
   }
+  bool debug = false;
+  assert(() {
+    debug = true;
+    return true;
+  }());
   await FlutterDownloader.initialize(
-      debug: true // optional: set false to disable printing logs to console
-      );
+    debug: debug,
+  );
   var prefs = await SharedPreferences.getInstance();
 
   try {

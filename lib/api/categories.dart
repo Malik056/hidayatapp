@@ -8,7 +8,8 @@ class CategoryAPIs {
     // ignore: close_sinks
     StreamController<List<Category>> categoriesStreamController =
         StreamController<List<Category>>.broadcast();
-    var ref = FirebaseFirestore.instance.collection("categories");
+    var ref =
+        FirebaseFirestore.instance.collection("categories").orderBy('name');
     var streamSubscription = ref.snapshots().listen((event) {
       categoriesStreamController.add(
         event.docs.map((e) => Category.fromSnapshot(e)).toList(),

@@ -10,7 +10,8 @@ class PlaylistAPIs {
         StreamController<List<Playlist>>();
     var ref = FirebaseFirestore.instance
         .collection("playlists")
-        .where('categoryId', isEqualTo: categoryId);
+        .where('categoryId', isEqualTo: categoryId)
+        .orderBy('name');
     ref.snapshots().listen((event) {
       playlistsStreamController.add(
         event.docs.map((e) => Playlist.fromJson(e.data())).toList(),
