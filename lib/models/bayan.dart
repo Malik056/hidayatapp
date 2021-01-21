@@ -29,6 +29,14 @@ class Bayan {
   }
   Map<String, dynamic> toJson() => _$BayanToJson(this);
 
+  String getUniqueFileName() {
+    var split = name.split('.');
+    if (split.length == 0) {
+      return id;
+    }
+    return id + split[split.length - 1];
+  }
+
   bool equals(Bayan other) {
     return id == other.id &&
         name == other.name &&

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hidayat/providers/current_playing.dart';
+import 'package:hidayat/providers/download_provider.dart';
 
 import 'package:hidayat/providers/selectedCalegory.dart';
 import 'package:hidayat/providers/volume.dart';
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (ctx) => DownloadProvider()),
         ChangeNotifierProvider(create: (ctx) => PlayingNowProvider()),
         ChangeNotifierProvider(create: (ctx) => VolumeProvider()),
         ChangeNotifierProvider(create: (ctx) => SelectedCategory()),
