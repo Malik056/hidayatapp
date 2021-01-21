@@ -27,6 +27,7 @@ void main() async {
   await FlutterDownloader.initialize(
     debug: debug,
   );
+  FlutterDownloader.cancelAll();
   var prefs = await SharedPreferences.getInstance();
 
   try {

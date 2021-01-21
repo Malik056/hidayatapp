@@ -27,6 +27,7 @@ class BayansProvider extends ChangeNotifier {
       _querySnapshotStreamSubscription = FirebaseFirestore.instance
           .collection("bayans")
           .where("playlistId", isEqualTo: playlistId)
+          .orderBy('name')
           .snapshots()
           .listen((event) async {
         error = null;

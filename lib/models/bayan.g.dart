@@ -16,7 +16,7 @@ Bayan _$BayanFromJson(Map<String, dynamic> json) {
     json['name'] as String,
     json['description'] as String ?? '',
     json['playlistId'] as String,
-  );
+  )..filePath = json['filePath'] as String;
 }
 
 Map<String, dynamic> _$BayanToJson(Bayan instance) => <String, dynamic>{
@@ -25,4 +25,5 @@ Map<String, dynamic> _$BayanToJson(Bayan instance) => <String, dynamic>{
       'id': instance.id,
       'playlistId': instance.playlistId,
       'description': instance.description,
+      'filePath': instance.filePath,
     };

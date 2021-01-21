@@ -3,7 +3,6 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:circular_usage_indicator/circular_usage_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hidayat/models/bayan.dart';
 import 'package:hidayat/models/playlist.dart' as myPlaylist;
 import 'package:hidayat/providers/bayans.dart';
@@ -54,14 +53,25 @@ class BayansRoute extends StatelessWidget {
           Spacer(),
           Text('Downlaoding Playlist'),
           SizedBox(width: 10),
-          CircularUsageIndicator(
-            backgroundColor: Colors.white,
-            progressColor: Colors.blue,
-            borderColor: Colors.transparent,
-            borderWidth: 0.0,
-            children: [
-              Text('${avgProgress.toStringAsFixed(1)}%'),
-            ],
+          Container(
+            margin: EdgeInsets.all(10.0),
+            width: 50,
+            height: 50,
+            child: CircularUsageIndicator(
+              backgroundColor: Colors.white,
+              progressColor: Colors.blue,
+              borderColor: Colors.transparent,
+              borderWidth: 0.0,
+              progressValue: avgProgress / 100.0,
+              children: [
+                Text(
+                  '${avgProgress?.toStringAsFixed(1)}%',
+                  style: TextStyle(
+                    fontSize: 6.0,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -129,170 +139,183 @@ class BayansRoute extends StatelessWidget {
                                     ),
                                   ))
                                 : Column(
-                                  children: [
-                                    SizedBox(
-                                      child: Center(
+                                    children: [
+                                      Center(
                                         child: Row(
                                           children: [
-                                            Spacer(),
-                                            Consumer<DownloadProvider>(
-                                              builder: (context, provider,
-                                                  child) {
-                                                return buildDownloadBar(
-                                                    context,
-                                                    data,
-                                                    provider);
-                                              },
+                                            Expanded(
+                                              child: Consumer<DownloadProvider>(
+                                                builder:
+                                                    (context, provider, child) {
+                                                  return buildDownloadBar(
+                                                      context, data, provider);
+                                                },
+                                              ),
                                             )
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    ListView.builder(
-                                      shrinkWrap: true,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 0,
-                                      ),
-                                      itemCount: data.state.length,
-                                      itemBuilder: (ctx, index) {
-                                        playlist.bayans = data.state;
-                                        return Column(
-                                          mainAxisSize:
-                                              MainAxisSize.min,
-                                          children: [
-                                            InkWell(
-                                              onTap: () async {
-                                                var provider = Provider
-                                                    .of<PlayingNowProvider>(
-                                                        context,
-                                                        listen: false);
-                                                if (playlist
-                                                        .bayans[index]
-                                                        .id ==
-                                                    provider.id) {
-                                                  provider
-                                                      .togglePlayback();
-                                                  return;
-                                                }
-                                                String pLId =
-                                                    provider.playlistId;
-                                                if (pLId ==
-                                                    playlist.id) {
-                                                  provider.playAtIndex(
-                                                      index);
-                                                  return;
-                                                }
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 0,
+                                        ),
+                                        itemCount: data.state.length,
+                                        itemBuilder: (ctx, index) {
+                                          playlist.bayans = data.state;
+                                          return Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              InkWell(
+                                                onTap: () async {
+                                                  var provider = Provider.of<
+                                                          PlayingNowProvider>(
+                                                      context,
+                                                      listen: false);
+                                                  if (playlist
+                                                          .bayans[index].id ==
+                                                      provider.id) {
+                                                    provider.togglePlayback();
+                                                    return;
+                                                  }
+                                                  String pLId =
+                                                      provider.playlistId;
+                                                  if (pLId == playlist.id) {
+                                                    provider.playAtIndex(index);
+                                                    return;
+                                                  }
 
-                                                provider.addPlaylist(
-                                                    playlist.bayans
-                                                        .map(
-                                                          (e) => audio_player
-                                                                  .Audio
-                                                              .network(
-                                                            e.link,
-                                                            cached:
-                                                                false,
-                                                            metas: audio_player
-                                                                .Metas(
-                                                              title: e
-                                                                  .name,
-                                                              album: playlist
-                                                                  .name,
-                                                              id: e.id,
-                                                              extra: {
-                                                                "index":
-                                                                    index,
-                                                                "playlistId":
-                                                                    playlist.id,
-                                                              },
-                                                              image: ((playlist.image?.isEmpty ?? '') ==
-                                                                      '')
-                                                                  ? audio_player.MetasImage.asset(
-                                                                      'images/placeholder_playlist.jpg')
-                                                                  : audio_player.MetasImage.network(
-                                                                      playlist.image),
+                                                  provider.addPlaylist(
+                                                      playlist.bayans
+                                                          .map(
+                                                            (e) => (e?.filePath
+                                                                        ?.isEmpty ??
+                                                                    true)
+                                                                ? audio_player
+                                                                        .Audio
+                                                                    .network(
+                                                                    e.link,
+                                                                    cached:
+                                                                        false,
+                                                                    metas: audio_player
+                                                                        .Metas(
+                                                                      title: e
+                                                                          .name,
+                                                                      album: playlist
+                                                                          .name,
+                                                                      id: e.id,
+                                                                      extra: {
+                                                                        "index":
+                                                                            index,
+                                                                        "playlistId":
+                                                                            playlist.id,
+                                                                      },
+                                                                      image: ((playlist.image?.isEmpty ?? '') ==
+                                                                              '')
+                                                                          ? audio_player.MetasImage.asset(
+                                                                              'images/placeholder_playlist.jpg')
+                                                                          : audio_player.MetasImage.network(
+                                                                              playlist.image),
+                                                                    ),
+                                                                  )
+                                                                : audio_player
+                                                                    .Audio.file(
+                                                                    e.filePath,
+                                                                    metas: audio_player
+                                                                        .Metas(
+                                                                      title: e
+                                                                          .name,
+                                                                      album: playlist
+                                                                          .name,
+                                                                      id: e.id,
+                                                                      extra: {
+                                                                        "index":
+                                                                            index,
+                                                                        "playlistId":
+                                                                            playlist.id,
+                                                                      },
+                                                                      image: ((playlist.image?.isEmpty ?? '') ==
+                                                                              '')
+                                                                          ? audio_player.MetasImage.asset(
+                                                                              'images/placeholder_playlist.jpg')
+                                                                          : audio_player.MetasImage.network(
+                                                                              playlist.image),
+                                                                    ),
+                                                                  ),
+                                                          )
+                                                          .toList(),
+                                                      index,
+                                                      playlist);
+                                                },
+                                                child: Container(
+                                                  height: 40,
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Expanded(
+                                                          flex: 1,
+                                                          child: Text(
+                                                            "${index + 1}",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: textTheme
+                                                                .subtitle1
+                                                                .copyWith(
+                                                              color:
+                                                                  Colors.grey,
                                                             ),
-                                                          ),
-                                                        )
-                                                        .toList(),
-                                                    index,
-                                                    playlist);
-                                              },
-                                              child: Container(
-                                                height: 40,
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
-                                                  children: [
-                                                    Expanded(
-                                                        flex: 1,
-                                                        child: Text(
-                                                          "${index + 1}",
-                                                          textAlign:
-                                                              TextAlign
-                                                                  .center,
-                                                          style: textTheme
-                                                              .subtitle1
-                                                              .copyWith(
-                                                            color: Colors
-                                                                .grey,
-                                                          ),
-                                                        )),
-                                                    Expanded(
-                                                      flex: 4,
-                                                      child: playingNow
-                                                                  ?.id ==
-                                                              playlist
-                                                                  .bayans[
-                                                                      index]
-                                                                  .id
-                                                          ? Marquee(
-                                                              text: data
-                                                                      .state[index]
-                                                                      .name ??
-                                                                  "Anonymous",
-                                                              style: textTheme
-                                                                  .subtitle1
-                                                                  .copyWith(
-                                                                color: Colors
-                                                                    .black,
+                                                          )),
+                                                      Expanded(
+                                                        flex: 4,
+                                                        child: playingNow?.id ==
+                                                                playlist
+                                                                    .bayans[
+                                                                        index]
+                                                                    .id
+                                                            ? Marquee(
+                                                                text: data
+                                                                        .state[
+                                                                            index]
+                                                                        .name ??
+                                                                    "Anonymous",
+                                                                style: textTheme
+                                                                    .subtitle1
+                                                                    .copyWith(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                blankSpace: 200,
+                                                              )
+                                                            : Text(
+                                                                data.state[index]
+                                                                        .name ??
+                                                                    "Anonymous",
+                                                                style: textTheme
+                                                                    .subtitle1
+                                                                    .copyWith(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
                                                               ),
-                                                              blankSpace:
-                                                                  200,
-                                                            )
-                                                          : Text(
-                                                              data.state[index]
-                                                                      .name ??
-                                                                  "Anonymous",
-                                                              style: textTheme
-                                                                  .subtitle1
-                                                                  .copyWith(
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
-                                                            ),
-                                                    ),
-                                                    if (playingNow
-                                                            ?.id ==
-                                                        playlist
-                                                            .bayans[
-                                                                index]
-                                                            .id)
-                                                      Icon(Icons
-                                                          .volume_up)
-                                                  ],
+                                                      ),
+                                                      if (playingNow?.id ==
+                                                          playlist
+                                                              .bayans[index].id)
+                                                        Icon(Icons.volume_up)
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            Divider(),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                              Divider(),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
                       );
                     });
               },

@@ -99,7 +99,11 @@ class PlayingNowProvider extends ChangeNotifier {
     _subscription = _player.onReadyToPlay.listen((event) {
       print("OpenNewPlayer On Ready To Play");
       if (!(_player?.isPlaying?.value ?? true)) {
-        _player?.play();
+        try {
+          _player?.play();
+        } catch (ex) {
+          print(ex);
+        }
       }
       if (_player != null && event != null && event.audio != null) {
         _isReady = true;

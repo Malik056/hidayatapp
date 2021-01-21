@@ -31,7 +31,7 @@ class BayanDbHelper {
 
   Future<List<Bayan>> getBayans(String playlistId) async {
     return (await database.query(Bayan.tableName,
-            where: "playlistId=?", whereArgs: [playlistId]))
+            where: "playlistId=?", whereArgs: [playlistId], orderBy: 'name ASC',))
         .map<Bayan>((e) => Bayan.fromJson(e))
         .toList();
   }

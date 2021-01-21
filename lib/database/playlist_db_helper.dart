@@ -32,7 +32,7 @@ class PlaylistDbHelper {
 
   Future<List<Playlist>> getPlaylists(String categoryId) async {
     return (await database.query(Playlist.tableName,
-            where: "categoryId=?", whereArgs: [categoryId]))
+            where: "categoryId=?", whereArgs: [categoryId], orderBy: "name ASC"))
         .map<Playlist>((e) => Playlist.fromJson(e))
         .toList();
   }

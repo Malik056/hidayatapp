@@ -5,6 +5,7 @@ import 'bayan.dart';
 class DownloadTaskState {
   DownloadTaskStatus status;
   int progress;
+  int totalFiles;
   String taskId;
   Bayan bayan;
   String playlistId;

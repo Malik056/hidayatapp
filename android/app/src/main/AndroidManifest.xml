@@ -75,7 +75,7 @@
             <!-- changes this number to configure the maximum number of concurrent tasks -->
             <meta-data
                 android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
-                android:value="5" />
+                android:value="1" />
         </provider>
         <provider
             android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"

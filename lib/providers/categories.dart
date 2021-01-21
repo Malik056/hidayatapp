@@ -28,6 +28,7 @@ class CategoriesProvider extends ChangeNotifier {
 
       _querySnapshotStreamSubscription = FirebaseFirestore.instance
           .collection("categories")
+          .orderBy('name')
           .snapshots()
           .listen((event) async {
         error = null;

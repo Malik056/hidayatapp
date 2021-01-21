@@ -37,6 +37,7 @@ class DownloadProvider extends ChangeNotifier {
       print("progress $progress");
       print("status $status");
       var downloadTaskState = _taskQueue.getDownloadStateByTaskId(id);
+      if (downloadTaskState == null) return;
       downloadTaskState
         ..progress = progress
         ..status = status;
@@ -46,6 +47,9 @@ class DownloadProvider extends ChangeNotifier {
 
         MySQLiteDatabase.getInstance().bayanDbHelper.updateBayan(bayan);
         _taskQueue.removeTaskById(id);
+      } else if (status == DownloadTaskStatus.failed) {
+        String playlistId = _taskQueue.getDownloadStateByTaskId(id).playlistId;
+        _taskQueue.stopAllPlaylistTasks(playlistId);
       }
       notifyListeners();
     });
@@ -69,12 +73,17 @@ class DownloadProvider extends ChangeNotifier {
     downloadStates.forEach((element) {
       avg += element.progress;
     });
-    return avg / downloadStates.length;
+    int length = downloadStates.length;
+    if (length < downloadStates.first.totalFiles) {
+      int diff = downloadStates.first.totalFiles - length;
+      avg += 100 * diff;
+    }
+    return avg / downloadStates.first.totalFiles;
   }
 
   void downloadPlaylist(Playlist playlist) async {
     List<Bayan> bayans = playlist.bayans;
-    Directory directory = await getApplicationDocumentsDirectory();
+    Directory directory = await getExternalStorageDirectory();
     // List<DownloadTaskState> tasks =
     //     _taskQueue.getDownloadStateOfPlaylist(playlist.id);
     // if (tasks == null) {
@@ -82,37 +91,37 @@ class DownloadProvider extends ChangeNotifier {
     //   _downloadQueue.putIfAbsent(playlist.id, () => tasks);
     // }
     for (int i = 0; i < bayans.length; i++) {
-      if (bayans[i].filePath == null || bayans[i].filePath.isEmpty) {
-        String path = directory.path;
-        int pathSeparator = Platform.pathSeparator
-            .codeUnitAt(Platform.pathSeparator.length - 1);
-        if (path.codeUnitAt(path.length - 1) != pathSeparator) {
-          path = path + Platform.pathSeparator;
-        }
-        try {
-          File file = new File(path + bayans[i].getUniqueFileName());
-          if (await file.exists()) {
-            await file.delete();
-          }
-        } catch (ex) {
-          print(ex);
-        }
-        final taskId = await FlutterDownloader.enqueue(
-          url: bayans[i].link,
-          fileName: bayans[i].getUniqueFileName(),
-          showNotification: false,
-          requiresStorageNotLow: true,
-          savedDir: directory.path,
-        );
-        var downloadState = DownloadTaskState()
-          ..bayan = bayans[i]
-          ..progress = 0
-          ..path = directory.path + bayans[i].link
-          ..status = DownloadTaskStatus.enqueued
-          ..taskId = taskId
-          ..playlistId = playlist.id;
-        _taskQueue.addTask(downloadState);
+      String path = directory.path;
+      int pathSeparator =
+          Platform.pathSeparator.codeUnitAt(Platform.pathSeparator.length - 1);
+      if (path.codeUnitAt(path.length - 1) != pathSeparator) {
+        path = path + Platform.pathSeparator;
       }
+      try {
+        File file = new File(path + bayans[i].getUniqueFileName());
+        if (await file.exists()) {
+          await file.delete();
+        }
+      } catch (ex) {
+        print(ex);
+      }
+
+      final taskId = await FlutterDownloader.enqueue(
+        url: bayans[i].link,
+        fileName: bayans[i].getUniqueFileName(),
+        showNotification: true,
+        requiresStorageNotLow: true,
+        savedDir: directory.path,
+      );
+      var downloadState = DownloadTaskState()
+        ..bayan = bayans[i]
+        ..progress = 0
+        ..path = path + bayans[i].getUniqueFileName()
+        ..status = DownloadTaskStatus.enqueued
+        ..taskId = taskId
+        ..totalFiles = bayans.length
+        ..playlistId = playlist.id;
+      _taskQueue.addTask(downloadState);
     }
   }
 

@@ -30,7 +30,7 @@ class CategoryDbHelper {
   }
 
   Future<List<Category>> getCategories() async {
-    return (await database.query(Category.tableName))
+    return (await database.query(Category.tableName, orderBy: "name ASC"))
         .map<Category>((e) => Category.fromJson(e))
         .toList();
   }

@@ -1,4 +1,4 @@
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 
 import 'download_state.dart';
 
@@ -40,6 +40,16 @@ class DownloadQueue {
       print(ex);
       return null;
     }
+  }
+
+  void stopAllPlaylistTasks(String playlistId) {
+    List<DownloadTaskState> taskStates = _downloadQueue[playlistId];
+    taskStates?.forEach((element) {
+      FlutterDownloader.remove(taskId: element.taskId);
+      _tasksQueue.remove(element.taskId);
+    });
+    _downloadQueue[playlistId]?.clear();
+    _downloadQueue[playlistId] = null;
   }
 
   void removePlaylistTasks(String playlistId) {

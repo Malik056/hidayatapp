@@ -17,8 +17,6 @@ class Bayan {
   String description;
   @JsonKey(defaultValue: null)
   String filePath;
-  @JsonKey(ignore: true)
-  double progress = 0;
 
   Bayan(this.id, this.link, this.name, this.description, this.playlistId);
   factory Bayan.fromJson(Map<String, dynamic> json) => _$BayanFromJson(json);
@@ -31,10 +29,14 @@ class Bayan {
 
   String getUniqueFileName() {
     var split = name.split('.');
-    if (split.length == 0) {
+    if (split.length <= 1) {
       return id;
     }
-    return id + split[split.length - 1];
+    String ext = split[split.length - 1];
+    if (ext.contains(' ')) {
+      return id;
+    }
+    return id + ext;
   }
 
   bool equals(Bayan other) {
