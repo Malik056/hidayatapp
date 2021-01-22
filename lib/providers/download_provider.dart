@@ -47,7 +47,7 @@ class DownloadProvider extends ChangeNotifier {
 
         MySQLiteDatabase.getInstance().bayanDbHelper.updateBayan(bayan);
         _taskQueue.removeTaskById(id);
-      } else if (status == DownloadTaskStatus.failed) {
+      } else if (status == DownloadTaskStatus.failed || progress == -1) {
         String playlistId = _taskQueue.getDownloadStateByTaskId(id).playlistId;
         _taskQueue.stopAllPlaylistTasks(playlistId);
       }
@@ -109,7 +109,7 @@ class DownloadProvider extends ChangeNotifier {
       final taskId = await FlutterDownloader.enqueue(
         url: bayans[i].link,
         fileName: bayans[i].getUniqueFileName(),
-        showNotification: true,
+        showNotification: false,
         requiresStorageNotLow: true,
         savedDir: directory.path,
       );

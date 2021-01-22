@@ -46,10 +46,21 @@ class DownloadQueue {
     }
   }
 
-  void stopAllPlaylistTasks(String playlistId) {
+  Future<void> stopTask(String taskId) async {
+    await FlutterDownloader.cancel(taskId: taskId);
+    await FlutterDownloader.remove(taskId: taskId, shouldDeleteContent: true);
+    var state = _tasksQueue.remove(taskId);
+    if (state == null) return;
+    _downloadQueue[state.playlistId]
+        ?.removeWhere((element) => element.taskId == taskId);
+  }
+
+  Future<void> stopAllPlaylistTasks(String playlistId) async {
     List<DownloadTaskState> taskStates = _downloadQueue[playlistId];
-    taskStates?.forEach((element) {
-      FlutterDownloader.remove(taskId: element.taskId);
+    taskStates?.forEach((element) async {
+      await FlutterDownloader.cancel(taskId: element.taskId);
+      await FlutterDownloader.remove(
+          taskId: element.taskId, shouldDeleteContent: true);
       _tasksQueue.remove(element.taskId);
     });
     _downloadQueue[playlistId]?.clear();
