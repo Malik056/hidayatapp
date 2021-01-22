@@ -18,6 +18,10 @@ class DownloadQueue {
     return _tasksQueue[taskId];
   }
 
+  void createEmptyTaskListIfAbsent(String playlistId) {
+    _downloadQueue.putIfAbsent(playlistId, () => []);
+  }
+
   List<DownloadTaskState> addTask(DownloadTaskState state) {
     assert(state?.playlistId?.isNotEmpty ?? false);
     String playlistId = state.playlistId;
@@ -34,7 +38,7 @@ class DownloadQueue {
     try {
       DownloadTaskState state = _tasksQueue.remove(taskId);
       _downloadQueue[state.playlistId]
-          .removeWhere((element) => element.taskId == taskId);
+          ?.removeWhere((element) => element.taskId == taskId);
       return state;
     } catch (ex) {
       print(ex);

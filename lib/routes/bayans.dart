@@ -304,7 +304,11 @@ class BayansRoute extends StatelessWidget {
                                                       if (playingNow?.id ==
                                                           playlist
                                                               .bayans[index].id)
-                                                        Icon(Icons.volume_up)
+                                                        Icon(Icons.volume_up),
+                                                      if (playingNow?.id ==
+                                                          playlist
+                                                              .bayans[index].id)
+                                                        SizedBox(width: 10)
                                                     ],
                                                   ),
                                                 ),
