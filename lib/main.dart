@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:hidayat/providers/current_playing.dart';
 import 'package:hidayat/providers/download_provider.dart';
 
@@ -19,15 +18,12 @@ void main() async {
   if (FirebaseAuth.instance.currentUser == null) {
     FirebaseAuth.instance.signInAnonymously();
   }
+  // ignore: unused_local_variable
   bool debug = false;
   assert(() {
     debug = true;
     return true;
   }());
-  await FlutterDownloader.initialize(
-    debug: debug,
-  );
-  FlutterDownloader.cancelAll();
   var prefs = await SharedPreferences.getInstance();
 
   try {

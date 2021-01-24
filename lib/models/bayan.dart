@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hidayat/mixin/downloadable.dart';
 import 'package:hidayat/models/playlist.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'bayan.g.dart';
 
 @JsonSerializable(nullable: true)
-class Bayan {
+class Bayan extends Downloadable {
   String link;
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String name;

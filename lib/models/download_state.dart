@@ -1,10 +1,10 @@
-import 'package:flutter_downloader/flutter_downloader.dart';
-
 import 'bayan.dart';
+
+enum DownloadTaskStatus { enqueued, downloading, completed }
 
 class DownloadTaskState {
   DownloadTaskStatus status;
-  int progress;
+  double progress;
   int totalFiles;
   String taskId;
   Bayan bayan;
