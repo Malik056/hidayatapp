@@ -55,10 +55,12 @@ class DownloadQueue {
               if (state == null) {
                 return;
               }
+              state.status = DownloadTaskStatus.downloading;
               if (progressUpdate != null) progressUpdate();
               state.progress = count / total;
               if (count == total) {
                 state.bayan.filePath = state.path;
+                state.status = DownloadTaskStatus.completed;
                 await state.bayan.downloadComplete(state);
                 if (i == queue.length - 1) {
                   _downloadQueue.remove(playlistId);

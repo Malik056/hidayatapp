@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 
 class DownloadProvider extends ChangeNotifier {
   final DownloadQueue _taskQueue = DownloadQueue();
+  bool pauseDownloadButton = false;
 
   ///returns `-1` if the playlist in not present.
   ///
@@ -32,6 +33,8 @@ class DownloadProvider extends ChangeNotifier {
   }
 
   void downloadPlaylist(Playlist playlist) async {
+    pauseDownloadButton = true;
+    notifyListeners();
     List<Bayan> bayans = playlist.bayans;
     Directory directory = await getExternalStorageDirectory();
     String path = directory.path;
@@ -46,8 +49,7 @@ class DownloadProvider extends ChangeNotifier {
         if (await file.exists()) {
           if (bayans[i].filePath == file.path) {
             continue;
-          }
-          else {
+          } else {
             await file.delete();
           }
         }
@@ -72,6 +74,7 @@ class DownloadProvider extends ChangeNotifier {
       //   savedDir: directory.path,
       // );
     }
+    pauseDownloadButton = false;
     if (_taskQueue.getDownloadStateOfPlaylist(playlist.id)?.isEmpty ?? true) {
       notifyListeners();
       return;
@@ -79,6 +82,7 @@ class DownloadProvider extends ChangeNotifier {
     _taskQueue.startDownloadQueue(playlist.id, () {
       notifyListeners();
     });
+    notifyListeners();
   }
 
   void removeAlltasksForPlaylist(String playlistId) {
