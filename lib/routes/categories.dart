@@ -50,7 +50,32 @@ class CategoryPage extends StatelessWidget {
           if (snapshot.state.isEmpty) {
             return Scaffold(
               backgroundColor: Colors.transparent,
-              body: Center(child: Text("Unable to find anything :(")),
+              body: Center(
+                  child: Card(
+                child: Container(
+                  height: 200,
+                  width: 200,
+                  padding: EdgeInsets.all(40),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Unable to find anything :(",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: () {
+                            (context as Element).markNeedsBuild();
+                          }),
+                    ],
+                  ),
+                ),
+              )),
             );
           }
           return Material(

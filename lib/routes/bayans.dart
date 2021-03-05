@@ -351,7 +351,7 @@ class BayansRoute extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        SizedBox(height: kToolbarHeight+30)
+                                        SizedBox(height: kToolbarHeight + 30)
                                       ],
                                     ),
                         );
