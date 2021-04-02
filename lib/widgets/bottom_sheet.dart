@@ -238,7 +238,7 @@ class _PlayerSheet extends StatelessWidget {
                 SizedBox(height: 10),
                 Text(
                   state == PlayerState.stop
-                      ? "No Audio Selected"
+                      ? "плейлист ба поён расид"
                       : '${data.bayanName}',
                   textAlign: TextAlign.center,
                   style: textTheme.headline6,

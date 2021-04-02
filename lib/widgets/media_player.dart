@@ -49,7 +49,7 @@ class _Player extends StatelessWidget {
                   Expanded(
                     child: Marquee(
                       text: state == PlayerState.stop
-                          ? "No Audio Selected"
+                          ? "плейлист ба поён расид"
                           : data.bayanName ?? "Anonymous",
                       style: textTheme.subtitle1,
                       scrollAxis: Axis.horizontal,

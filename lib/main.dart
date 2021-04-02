@@ -48,6 +48,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => ConnectivityProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Hidoyaat',
         theme: ThemeData(
           primarySwatch: Colors.blue,

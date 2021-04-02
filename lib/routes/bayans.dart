@@ -58,14 +58,14 @@ class BayansRoute extends StatelessWidget {
         icon: Icon(
           downloaded ? Icons.file_download_done : Icons.file_download,
         ),
-        label: Text(downloaded ? "Downloaded" : "Download"),
+        label: Text(downloaded ? "скачано" : "скачать"),
       );
     } else {
       double avgProgress = downloadProvider.avgProgress(playlist.id);
       return Row(
         children: [
           Spacer(),
-          Text('Downlaoding Playlist'),
+          Text('интизор шавед'),
           SizedBox(width: 10),
           Container(
             margin: EdgeInsets.all(10.0),
