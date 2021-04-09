@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hidayat/models/playlist.dart';
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import 'package:hidayat/models/playlist.dart';
 
 part 'category.g.dart';
 
 @JsonSerializable(nullable: true)
-class Category {
+class Category with Comparable<Category>{
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String name;
   @JsonKey(ignore: true)
@@ -43,4 +45,24 @@ class Category {
     description TEXT
   );
   ''';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Category && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode ^
+        playlists.hashCode ^
+        id.hashCode ^
+        description.hashCode;
+  }
+
+  @override
+  int compareTo(Category other) {
+    return name.compareTo(other.name);
+  }
 }

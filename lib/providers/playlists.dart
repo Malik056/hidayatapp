@@ -19,6 +19,7 @@ class PlaylistsProvider extends ChangeNotifier {
     mySQLiteDatabase.playlistDbHelper.getPlaylists(categoryId).then((value) {
       state = value ?? [];
       if (state != null && state.isNotEmpty) {
+        state.sort();
         _playlistsStreamController.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
@@ -58,7 +59,7 @@ class PlaylistsProvider extends ChangeNotifier {
         });
 
         if (state == null) state = [];
-
+        state.sort();
         _playlistsStreamController.add(state);
         notifyListeners();
       }, onError: (err) {

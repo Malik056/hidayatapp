@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hidayat/models/bayan.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import 'package:hidayat/models/bayan.dart';
 
 import 'category.dart';
 
 part 'playlist.g.dart';
 
 @JsonSerializable(nullable: true)
-class Playlist {
+class Playlist with Comparable<Playlist> {
   @JsonKey(required: true, nullable: false, disallowNullValue: true)
   String name;
   String image;
@@ -51,4 +52,26 @@ class Playlist {
        ON DELETE CASCADE
   );
   ''';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Playlist && other.id == id;
+  }
+
+  @override
+  int get hashCode {
+    return name.hashCode ^
+        image.hashCode ^
+        categoryId.hashCode ^
+        description.hashCode ^
+        bayans.hashCode ^
+        id.hashCode;
+  }
+
+  @override
+  int compareTo(Playlist other) {
+    return name.compareTo(other.name);
+  }
 }

@@ -21,6 +21,7 @@ class CategoriesProvider extends ChangeNotifier {
       // }
       state = value ?? [];
       if (state != null && state.isNotEmpty) {
+        state.sort();
         _categoriesStreamController.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
@@ -60,6 +61,7 @@ class CategoriesProvider extends ChangeNotifier {
           }
         });
         if (state == null) state = [];
+        state.sort();
         _categoriesStreamController.add(state);
         notifyListeners();
       }, onError: (err) {
