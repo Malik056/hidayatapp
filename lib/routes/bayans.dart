@@ -37,7 +37,7 @@ class BayansRoute extends StatelessWidget {
           downloaded = false;
         }
       });
-      return FlatButton.icon(
+      return TextButton.icon(
         onPressed: downloaded
             ? null
             : () {
@@ -167,10 +167,14 @@ class BayansRoute extends StatelessWidget {
                                                     Consumer<DownloadProvider>(
                                                   builder: (context, provider,
                                                       child) {
-                                                    return buildDownloadBar(
-                                                        context,
-                                                        data,
-                                                        provider);
+                                                    return Align(
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      child: buildDownloadBar(
+                                                          context,
+                                                          data,
+                                                          provider),
+                                                    );
                                                   },
                                                 ),
                                               )
@@ -344,14 +348,16 @@ class BayansRoute extends StatelessWidget {
                                                         ),
                                                       ),
                                                     ),
-                                                    Divider(),
+                                                    if (index !=
+                                                        data.state.length - 1)
+                                                      Divider(),
                                                   ],
                                                 );
                                               },
                                             ),
                                           ),
                                         ),
-                                        SizedBox(height: kToolbarHeight + 30)
+                                        SizedBox(height: 10),
                                       ],
                                     ),
                         );
