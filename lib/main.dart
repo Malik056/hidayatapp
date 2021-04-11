@@ -18,12 +18,6 @@ void main() async {
   if (FirebaseAuth.instance.currentUser == null) {
     FirebaseAuth.instance.signInAnonymously();
   }
-  // ignore: unused_local_variable
-  bool debug = false;
-  assert(() {
-    debug = true;
-    return true;
-  }());
   var prefs = await SharedPreferences.getInstance();
 
   try {

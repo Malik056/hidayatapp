@@ -20,22 +20,24 @@ class PlayingNowProvider extends ChangeNotifier {
   // PlayingNowState _state = PlayingNowState();
   AssetsAudioPlayer _player;
   bool _isReady = false;
-  PlayerState get playerState => _player?.playerState?.value;
+  PlayerState get playerState => _player?.playerState?.valueWrapper?.value;
   StreamSubscription<PlayingAudio> _subscription;
   Stream<PlayerState> get playerStateStream =>
       _player?.playerState?.asBroadcastStream();
 
-  String get id => _player?.current?.value?.audio?.audio?.metas?.id;
+  String get id =>
+      _player?.current?.valueWrapper?.value?.audio?.audio?.metas?.id;
 
   bool get isPlayerReady => _isReady;
 
-  Duration get position => _player?.currentPosition?.value;
+  Duration get position => _player?.currentPosition?.valueWrapper?.value;
 
-  int get fileIndex => _player?.current?.value?.index;
+  int get fileIndex => _player?.current?.valueWrapper?.value?.index;
 
   String get playlistId {
-    String id = (_player?.current?.value?.audio?.audio?.metas?.extra ??
-        {})['playlistId'];
+    String id =
+        (_player?.current?.valueWrapper?.value?.audio?.audio?.metas?.extra ??
+            {})['playlistId'];
     return id;
   }
 
@@ -50,12 +52,14 @@ class PlayingNowProvider extends ChangeNotifier {
   }
 
   String get playlistName {
-    String album = _player?.current?.value?.audio?.audio?.metas?.album;
+    String album =
+        _player?.current?.valueWrapper?.value?.audio?.audio?.metas?.album;
     return (album ?? '').isEmpty ? "Anonymous" : album;
   }
 
   String get bayanName {
-    String title = _player?.current?.value?.audio?.audio?.metas?.title;
+    String title =
+        _player?.current?.valueWrapper?.value?.audio?.audio?.metas?.title;
     return (title ?? '').isEmpty ? "Anonymous" : title;
   }
 
@@ -63,9 +67,9 @@ class PlayingNowProvider extends ChangeNotifier {
       _player?.currentPosition?.asBroadcastStream();
 
   Duration get duration =>
-      _player?.current?.value?.audio?.duration ?? Duration.zero;
+      _player?.current?.valueWrapper?.value?.audio?.duration ?? Duration.zero;
 
-  double get volume => _player?.volume?.value;
+  double get volume => _player?.volume?.valueWrapper?.value;
 
   Stream<double> get volumeStream => _player?.volume?.asBroadcastStream();
 
@@ -98,7 +102,7 @@ class PlayingNowProvider extends ChangeNotifier {
     }
     _subscription = _player.onReadyToPlay.listen((event) {
       print("OpenNewPlayer On Ready To Play");
-      if (!(_player?.isPlaying?.value ?? true)) {
+      if (!(_player?.isPlaying?.valueWrapper?.value ?? true)) {
         try {
           _player?.play();
         } catch (ex) {
@@ -156,11 +160,11 @@ class PlayingNowProvider extends ChangeNotifier {
     }
   }
 
-  double getVolume() => _player?.volume?.value ?? globals.volume;
+  double getVolume() => _player?.volume?.valueWrapper?.value ?? globals.volume;
 
   Future<void> seekTo(Duration newDuration) async {
     if (_player != null) {
-      if (_player.playerState.value != PlayerState.stop) {
+      if (_player.playerState.valueWrapper.value != PlayerState.stop) {
         _player.seek(newDuration).then((value) => notifyListeners);
       } else {}
     }
@@ -168,7 +172,7 @@ class PlayingNowProvider extends ChangeNotifier {
 
   Future<void> forward(Duration forwardBy) async {
     if (_player != null) {
-      if (_player.playerState.value != PlayerState.stop) {
+      if (_player.playerState.valueWrapper.value != PlayerState.stop) {
         _player.seekBy(forwardBy).then((value) => notifyListeners);
       }
     }
@@ -176,8 +180,8 @@ class PlayingNowProvider extends ChangeNotifier {
 
   Future<void> rewind(Duration rewindBy) async {
     if (_player != null) {
-      Duration result = (_player.currentPosition.value - rewindBy);
-      if (_player.playerState.value != PlayerState.stop) {
+      Duration result = (_player.currentPosition.valueWrapper.value - rewindBy);
+      if (_player.playerState.valueWrapper.value != PlayerState.stop) {
         _player
             .seek(result.inMilliseconds < 0 ? 0 : result)
             .then((value) => notifyListeners());

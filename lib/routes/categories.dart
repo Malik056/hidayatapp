@@ -62,13 +62,16 @@ class CategoryPage extends StatelessWidget {
                         "Unable to find anything :(",
                         style: TextStyle(
                           fontSize: 24,
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(height: 20),
                       IconButton(
-                          icon: Icon(Icons.refresh),
+                          icon: Icon(
+                            Icons.refresh,
+                            size: 32,
+                          ),
                           onPressed: () {
                             (context as Element).markNeedsBuild();
                           }),

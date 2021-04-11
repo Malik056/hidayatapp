@@ -35,8 +35,18 @@ class CategoriesProvider extends ChangeNotifier {
         error = null;
         // await mySQLiteDatabase.categoryDbHelper.clearCategories(categoryId);
         connectionState = ConnectionState.active;
+        print("COnnectionState: connectionState");
+        print("QuerySnpshot: $event");
+        print("MetaData: ${event.metadata}");
+        print("Doc Changes in category ${event.docChanges.join(',')}");
+        print("Doc Changes length Categories ${event.docChanges.length}");
         // state = event.docs.map((e) => Category.fromSnapshot(e)).toList();
-        event.docChanges.forEach((element) {
+        var docs;
+        docs = event.docChanges;
+        if(docs == null || docs.isEmpty) {
+          docs = event.docs;
+        }
+        docs.forEach((element) {
           Category category = Category.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
             Category categoryLocal =
@@ -65,6 +75,8 @@ class CategoriesProvider extends ChangeNotifier {
         _categoriesStreamController.add(state);
         notifyListeners();
       }, onError: (err) {
+        print("Error Occurred");
+        print("Error: $err");
         if (state?.isEmpty ?? true) {
           error = err.toString();
           notifyListeners();

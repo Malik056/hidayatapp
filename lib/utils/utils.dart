@@ -22,7 +22,7 @@ class Utils {
                 )),
         backgroundColor: Colors.red,
       );
-      scaffoldState.showSnackBar(snackbar);
+      ScaffoldMessenger.of(context)?.showSnackBar(snackbar);
     }
   }
 }
