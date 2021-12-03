@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:easyping/easyping.dart';
+import 'package:dart_ping/dart_ping.dart';
 import 'package:flutter/material.dart';
 
 class InternetConnectionState {
@@ -14,16 +14,20 @@ class InternetConnectionState {
 }
 
 class ConnectivityProvider extends ChangeNotifier {
-  InternetConnectionState state;
-  Connectivity _connectivity;
-  Future<void> initialize;
+  InternetConnectionState? state;
+  late Connectivity _connectivity;
+  late Future<void> initialize;
   ConnectivityProvider() {
     _connectivity = Connectivity();
     initialize = _initialize();
   }
 
   Future<bool> _isOnline() async {
-    bool result = await ping('8.8.8.8').then<bool>((value) async {
+    Ping ping = Ping('8.8.8.8');
+    bool result = await ping.stream.first.then<bool>((value) async {
+      if (value.error != null) {
+        return false;
+      }
       return true;
     }).timeout(
       Duration(seconds: 5),

@@ -8,21 +8,21 @@ class Utils {
     final directory = Platform.isAndroid
         ? await getExternalStorageDirectory()
         : await getApplicationDocumentsDirectory();
-    return directory.path;
+    return directory!.path;
   }
 
   static void showInSnackbarError(
       GlobalKey<ScaffoldState> scaffoldKey, BuildContext context, String text) {
-    ScaffoldState scaffoldState = scaffoldKey.currentState;
+    ScaffoldState? scaffoldState = scaffoldKey.currentState;
     if (scaffoldState != null && scaffoldState.mounted) {
       SnackBar snackbar = SnackBar(
         content: Text(text,
-            style: Theme.of(context).textTheme.bodyText2.copyWith(
+            style: Theme.of(context).textTheme.bodyText2?.copyWith(
                   color: Colors.white,
                 )),
         backgroundColor: Colors.red,
       );
-      ScaffoldMessenger.of(context)?.showSnackBar(snackbar);
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 }

@@ -7,13 +7,15 @@ part of 'category.dart';
 // **************************************************************************
 
 Category _$CategoryFromJson(Map<String, dynamic> json) {
-  $checkKeys(json,
-      requiredKeys: const ['name', 'id'],
-      disallowNullValues: const ['name', 'id']);
+  $checkKeys(
+    json,
+    requiredKeys: const ['name', 'id'],
+    disallowNullValues: const ['name', 'id'],
+  );
   return Category(
     json['id'] as String,
-    json['name'] as String,
-    json['description'] as String ?? '',
+    json['name'] as String? ?? '',
+    json['description'] as String? ?? '',
   );
 }
 

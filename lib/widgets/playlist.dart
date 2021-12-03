@@ -7,7 +7,7 @@ import 'package:hidayat/routes/bayans.dart';
 class PlaylistWidget extends StatelessWidget {
   final Playlist playlist;
 
-  const PlaylistWidget({Key key, this.playlist}) : super(key: key);
+  const PlaylistWidget({Key? key, required this.playlist}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +61,18 @@ class PlaylistWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    playlist.name ?? '',
+                    playlist.name ?? 'Anonymous',
                     textAlign: TextAlign.start,
-                    style: theme.subtitle1.copyWith(
+                    style: theme.subtitle1!.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 20),
                   Text(
-                    playlist.description ?? '',
+                    playlist.description,
                     textAlign: TextAlign.start,
-                    style: theme.bodyText2.copyWith(color: Colors.white),
+                    style: theme.bodyText2!.copyWith(color: Colors.white),
                   ),
                 ],
               ),
@@ -85,7 +85,7 @@ class PlaylistWidget extends StatelessWidget {
 }
 
 class EmptyPlaylistWidget extends StatelessWidget {
-  const EmptyPlaylistWidget({Key key}) : super(key: key);
+  const EmptyPlaylistWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class EmptyPlaylistWidget extends StatelessWidget {
             child: Text(
               "No Playlist Found!",
               textAlign: TextAlign.center,
-              style: theme.headline4.copyWith(color: Colors.white),
+              style: theme.headline4!.copyWith(color: Colors.white),
             ),
           )),
         ],

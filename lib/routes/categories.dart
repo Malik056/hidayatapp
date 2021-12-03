@@ -1,17 +1,21 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper_plus/flutter_swiper_plus.dart' as swiper;
+// ignore: implementation_imports
+import 'package:flutter_swiper_plus/src/transformer_page_view/buildin_transformers.dart'
+    show ScaleAndFadeTransformer;
+import 'package:provider/provider.dart';
+
 import 'package:hidayat/providers/categories.dart';
 import 'package:hidayat/providers/playlists.dart';
 import 'package:hidayat/providers/selectedCalegory.dart';
 import 'package:hidayat/scroll_physics/scroll_physics.dart';
 import 'package:hidayat/widgets/playlist.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 
 class CategoryPage extends StatelessWidget {
   static const String name = "CategoryPage";
-  final _horizontalController = SwiperController();
+  final _horizontalController = swiper.SwiperController();
   final PageController controller;
 
   CategoryPage(this.controller);
@@ -115,7 +119,7 @@ class CategoryPage extends StatelessWidget {
                           children: [
                             Spacer(flex: 1),
                             Text(snapshot.state[index].name,
-                                style: textTheme.headline6
+                                style: textTheme.headline6!
                                     .copyWith(color: Colors.white)),
                             Spacer(flex: 2),
                             Expanded(
@@ -143,7 +147,7 @@ class CategoryPage extends StatelessWidget {
                                       } else {
                                         snapshot.state[index].playlists =
                                             value.state;
-                                        return Swiper.list(
+                                        return swiper.Swiper.list(
                                           // items: List<Widget>.generate(
                                           //   value.state.length,
                                           //   (index) => PlaylistWidget(

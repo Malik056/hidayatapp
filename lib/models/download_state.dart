@@ -10,4 +10,13 @@ class DownloadTaskState {
   Bayan bayan;
   String playlistId;
   String path;
+  DownloadTaskState({
+    required this.status,
+    required this.progress,
+    required this.totalFiles,
+    required this.taskId,
+    required this.bayan,
+    required this.playlistId,
+    required this.path,
+  });
 }

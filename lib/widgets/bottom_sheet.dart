@@ -1,7 +1,8 @@
-import 'package:assets_audio_player/assets_audio_player.dart';
+// import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:hidayat/providers/current_playing.dart';
 import 'package:hidayat/providers/volume.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import '../globals/config.dart' as globals;
 
@@ -161,8 +162,8 @@ class _PlayerSheet extends StatelessWidget {
   final PlayingNowProvider data;
 
   const _PlayerSheet({
-    Key key,
-    @required this.data,
+    Key? key,
+    required this.data,
     // @required this.audioState,
     // this.position,
     // this.bayanName,
@@ -178,11 +179,19 @@ class _PlayerSheet extends StatelessWidget {
     // this.onSkipPrevious,
   }) : super(key: key);
 
-  String getTimeFromDuration(Duration time) {
+  String _getTimeFromDuration(Duration time) {
     int totalSeconds = time.inSeconds;
     int totalMinutes = time.inMinutes;
     int seconds = totalSeconds - (totalMinutes * 60);
     return "${totalMinutes < 10 ? '0$totalMinutes' : totalMinutes}:${seconds < 10 ? '0$seconds' : seconds}";
+  }
+
+  bool _isAudioLoaded(ProcessingState state) {
+    if (state == ProcessingState.idle || state == ProcessingState.completed) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   @override
@@ -192,151 +201,164 @@ class _PlayerSheet extends StatelessWidget {
         initialData: data.playerState,
         stream: data.playerStateStream,
         builder: (context, snapshot) {
-          var state = snapshot.data ?? PlayerState.stop;
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                StreamBuilder<Duration>(
-                  initialData: data.position,
-                  stream: data.positionStream,
-                  builder: (context, snapshot) {
-                    Duration position = snapshot.data ?? Duration.zero;
-                    Duration duration = data.duration;
-                    return Column(
-                      children: [
-                        Slider(
-                          value: position.inSeconds > duration.inSeconds
-                              ? duration.inSeconds.toDouble()
-                              : position.inSeconds.toDouble(),
-                          max: duration.inSeconds.toDouble(),
-                          min: 0,
-                          onChanged: (state == PlayerState.stop ||
-                                  !data.isPlayerReady)
-                              ? null
-                              : (value) {
-                                  data.seekTo(Duration(seconds: value.toInt()));
-                                },
-                        ),
-                        Row(
-                          children: [
-                            (state == PlayerState.stop || !data.isPlayerReady)
-                                ? Text("0:00")
-                                : Text(getTimeFromDuration(position)),
-                            Spacer(),
-                            (state == PlayerState.stop || !data.isPlayerReady)
-                                ? Text("0:00")
-                                : Text(getTimeFromDuration(duration)),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                SizedBox(height: 10),
-                Text(
-                  state == PlayerState.stop
-                      ? "плейлист ба поён расид"
-                      : '${data.bayanName}',
-                  textAlign: TextAlign.center,
-                  style: textTheme.headline6,
-                ),
-                Text(
-                  state == PlayerState.stop ? "" : '${data.playlistName}',
-                  textAlign: TextAlign.center,
-                  style: textTheme.subtitle1.copyWith(color: Colors.black),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          var state = snapshot.data ?? PlayerState(false, ProcessingState.idle);
+          return StreamBuilder<int?>(
+            stream: data.getCurrentIndexStream,
+            builder: (context, snapshot) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.fast_rewind),
-                      onPressed:
-                          (state == PlayerState.stop || !data.isPlayerReady)
+                    StreamBuilder<Duration?>(
+                      initialData: data.position,
+                      stream: data.positionStream,
+                      builder: (context, snapshot) {
+                        return StreamBuilder<Duration?>(
+                            stream: data.durationStream,
+                            initialData: data.duration,
+                            builder: (context, durationSnapshot) {
+                              Duration position = snapshot.data ?? Duration.zero;
+                              Duration duration =
+                                  durationSnapshot.data ?? Duration.zero;
+                              return Column(
+                                children: [
+                                  Slider(
+                                    value: position.inSeconds > duration.inSeconds
+                                        ? duration.inSeconds.toDouble()
+                                        : position.inSeconds.toDouble(),
+                                    max: duration.inSeconds.toDouble(),
+                                    min: 0,
+                                    // divisions: duration.inSeconds,
+                                    onChanged: !_isAudioLoaded(
+                                            state.processingState)
+                                        ? null
+                                        : (value) {
+                                            // int seekPosition =
+                                            //     (duration.inSeconds * value).toInt();
+                                            data.seekTo(
+                                                Duration(seconds: value.toInt()));
+                                          },
+                                  ),
+                                  Row(
+                                    children: [
+                                      (!state.playing)
+                                          ? Text("0:00")
+                                          : Text(_getTimeFromDuration(position)),
+                                      Spacer(),
+                                      (!state.playing)
+                                          ? Text("0:00")
+                                          : Text(_getTimeFromDuration(duration)),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      !_isAudioLoaded(state.processingState)
+                          ? "плейлист ба поён расид"
+                          : '${data.bayanName}',
+                      textAlign: TextAlign.center,
+                      style: textTheme.headline6,
+                    ),
+                    Text(
+                      !_isAudioLoaded(state.processingState)
+                          ? ""
+                          : '${data.playlistName}',
+                      textAlign: TextAlign.center,
+                      style: textTheme.subtitle1!.copyWith(color: Colors.black),
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(),
+                        IconButton(
+                          icon: Icon(Icons.fast_rewind),
+                          onPressed: !_isAudioLoaded(state.processingState)
                               ? null
                               : data.previous,
-                    ),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(state == PlayerState.play
-                          ? Icons.pause
-                          : Icons.play_arrow),
-                      onPressed:
-                          (state == PlayerState.stop || !data.isPlayerReady)
+                        ),
+                        Spacer(),
+                        IconButton(
+                          icon:
+                              Icon(state.playing ? Icons.pause : Icons.play_arrow),
+                          onPressed: !_isAudioLoaded(state.processingState)
                               ? null
                               : data.togglePlayback,
-                    ),
-                    Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.fast_forward),
-                      onPressed:
-                          (state == PlayerState.stop || !data.isPlayerReady)
+                        ),
+                        Spacer(),
+                        IconButton(
+                          icon: Icon(Icons.fast_forward),
+                          onPressed: !_isAudioLoaded(state.processingState)
                               ? null
                               : data.next,
+                        ),
+                        Spacer(),
+                      ],
                     ),
-                    Spacer(),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.center,
+                      child:
+                          // Consumer<VolumeProvider>(
+                          //   builder: (ctx, volume, _) =>
+                          StreamBuilder<double>(
+                              initialData: data.volume,
+                              stream: data.volumeStream,
+                              builder: (context, snapshot) {
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: (snapshot.data ?? globals.volume) == 0
+                                          ? Icon(Icons.volume_mute)
+                                          : Icon(Icons.volume_down),
+                                      onPressed: () {
+                                        double vol =
+                                            snapshot.data ?? globals.volume;
+                                        vol -= VolumeProvider.STEP;
+                                        if (vol < 0) {
+                                          vol = 0;
+                                        }
+                                        // volume = vol;
+                                        data.setVolume(vol);
+                                      },
+                                    ),
+                                    SizedBox(width: 4),
+                                    Slider(
+                                      value: snapshot.data ?? globals.volume,
+                                      min: 0,
+                                      max: 1.0,
+                                      onChanged: (value) {
+                                        data.setVolume(value);
+                                      },
+                                    ),
+                                    SizedBox(width: 4),
+                                    IconButton(
+                                        icon: Icon(Icons.volume_up),
+                                        onPressed: () {
+                                          double vol =
+                                              snapshot.data ?? globals.volume;
+                                          vol += VolumeProvider.STEP;
+                                          if (vol > 1.0) {
+                                            vol = 1.0;
+                                          }
+                                          data.setVolume(vol);
+                                        }),
+                                  ],
+                                );
+                              }),
+                      // ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.center,
-                  child:
-                      // Consumer<VolumeProvider>(
-                      //   builder: (ctx, volume, _) =>
-                      StreamBuilder<double>(
-                          initialData: data.volume,
-                          stream: data.volumeStream,
-                          builder: (context, snapshot) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: (snapshot.data ?? globals.volume) == 0
-                                      ? Icon(Icons.volume_mute)
-                                      : Icon(Icons.volume_down),
-                                  onPressed: () {
-                                    double vol =
-                                        snapshot.data ?? globals.volume;
-                                    vol -= VolumeProvider.STEP;
-                                    if (vol < 0) {
-                                      vol = 0;
-                                    }
-                                    // volume = vol;
-                                    data.setVolume(vol);
-                                  },
-                                ),
-                                SizedBox(width: 4),
-                                Slider(
-                                  value: snapshot.data ?? globals.volume,
-                                  min: 0,
-                                  max: 1.0,
-                                  onChanged: (value) {
-                                    data.setVolume(value);
-                                  },
-                                ),
-                                SizedBox(width: 4),
-                                IconButton(
-                                    icon: Icon(Icons.volume_up),
-                                    onPressed: () {
-                                      double vol =
-                                          snapshot.data ?? globals.volume;
-                                      vol += VolumeProvider.STEP;
-                                      if (vol > 1.0) {
-                                        vol = 1.0;
-                                      }
-                                      data.setVolume(vol);
-                                    }),
-                              ],
-                            );
-                          }),
-                  // ),
-                ),
-              ],
-            ),
+              );
+            }
           );
         });
   }

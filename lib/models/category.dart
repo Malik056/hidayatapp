@@ -5,24 +5,24 @@ import 'package:hidayat/models/playlist.dart';
 
 part 'category.g.dart';
 
-@JsonSerializable(nullable: true)
-class Category with Comparable<Category>{
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+@JsonSerializable()
+class Category with Comparable<Category> {
+  @JsonKey(required: true, disallowNullValue: true)
   String name;
   @JsonKey(ignore: true)
-  List<Playlist> playlists;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+  List<Playlist>? playlists;
+  @JsonKey(required: true, disallowNullValue: true)
   String id;
   @JsonKey(defaultValue: "")
   String description;
 
-  Category(this.id, this.name, this.description);
+  Category(this.id, [this.name = '', this.description = '']);
 
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
 
   factory Category.fromSnapshot(DocumentSnapshot snapshot) {
-    Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.data());
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     data.putIfAbsent('id', () => snapshot.id);
     return Category.fromJson(data);
   }

@@ -22,7 +22,7 @@ class DownloadProvider extends ChangeNotifier {
     double avg = 0;
     List<DownloadTaskState> downloadStates =
         _taskQueue.getDownloadStateOfPlaylist(playlistId);
-    if (downloadStates?.isEmpty ?? true) {
+    if (downloadStates.isEmpty) {
       return -1;
     }
     downloadStates.forEach((element) {
@@ -35,9 +35,9 @@ class DownloadProvider extends ChangeNotifier {
   void downloadPlaylist(Playlist playlist) async {
     pauseDownloadButton = true;
     notifyListeners();
-    List<Bayan> bayans = playlist.bayans;
-    Directory directory = await getExternalStorageDirectory();
-    String path = directory.path;
+    List<Bayan> bayans = playlist.bayans ?? [];
+    Directory? directory = await getExternalStorageDirectory();
+    String path = directory!.path;
     int pathSeparator =
         Platform.pathSeparator.codeUnitAt(Platform.pathSeparator.length - 1);
     if (path.codeUnitAt(path.length - 1) != pathSeparator) {
@@ -57,14 +57,22 @@ class DownloadProvider extends ChangeNotifier {
         print(ex);
       }
       String taskId = "${DateTime.now().millisecondsSinceEpoch}";
-      var downloadState = DownloadTaskState()
-        ..bayan = bayans[i]
-        ..progress = 0
-        ..path = path + bayans[i].getUniqueFileName()
-        ..status = DownloadTaskStatus.enqueued
-        ..taskId = taskId
-        ..totalFiles = bayans.length
-        ..playlistId = playlist.id;
+      var downloadState = DownloadTaskState(
+        bayan: bayans[i],
+        progress: 0,
+        path: path + bayans[i].getUniqueFileName(),
+        status: DownloadTaskStatus.enqueued,
+        taskId: taskId,
+        totalFiles: bayans.length,
+        playlistId: playlist.id,
+      );
+      // ..bayan = bayans[i]
+      // ..progress = 0
+      // ..path = path + bayans[i].getUniqueFileName()
+      // ..status = DownloadTaskStatus.enqueued
+      // ..taskId = taskId
+      // ..totalFiles = bayans.length
+      // ..playlistId = playlist.id;
       _taskQueue.addTask(downloadState);
       // final taskId = await FlutterDownloader.enqueue(
       //   url: bayans[i].link,
@@ -75,7 +83,7 @@ class DownloadProvider extends ChangeNotifier {
       // );
     }
     pauseDownloadButton = false;
-    if (_taskQueue.getDownloadStateOfPlaylist(playlist.id)?.isEmpty ?? true) {
+    if (_taskQueue.getDownloadStateOfPlaylist(playlist.id).isEmpty) {
       notifyListeners();
       return;
     }

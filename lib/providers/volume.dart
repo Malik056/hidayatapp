@@ -5,7 +5,7 @@ class VolumeProvider extends ChangeNotifier {
   double _volume = 0;
   double maxVolume = 1;
   static const double STEP = 0.2;
-  Future initialize;
+  late Future initialize;
   VolumeProvider() {
     try {
       initialize = VolumeWatcher.getMaxVolume.then((value) async {

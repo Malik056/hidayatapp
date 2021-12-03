@@ -6,21 +6,21 @@ import 'package:hidayat/database/database.dart';
 import 'package:hidayat/models/playlist.dart';
 
 class PlaylistsProvider extends ChangeNotifier {
-  StreamSubscription _querySnapshotStreamSubscription;
-  StreamController<List<Playlist>> _playlistsStreamController;
+  late StreamSubscription? _querySnapshotStreamSubscription;
+  late StreamController<List<Playlist>>? _playlistsStreamController;
   List<Playlist> state = [];
   String categoryId;
   ConnectionState connectionState = ConnectionState.waiting;
-  String error;
+  String? error;
 
   PlaylistsProvider(this.categoryId) {
     _playlistsStreamController = StreamController();
     MySQLiteDatabase mySQLiteDatabase = MySQLiteDatabase.getInstance();
     mySQLiteDatabase.playlistDbHelper.getPlaylists(categoryId).then((value) {
-      state = value ?? [];
-      if (state != null && state.isNotEmpty) {
+      state = value;
+      if (state.isNotEmpty) {
         state.sort();
-        _playlistsStreamController.add(state);
+        _playlistsStreamController!.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
       }
@@ -36,10 +36,14 @@ class PlaylistsProvider extends ChangeNotifier {
         event.docChanges.forEach((element) {
           Playlist playlist = Playlist.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
-            Playlist playlistLocal =
-                state.firstWhere((_) => playlist.id == _.id, orElse: () {
-              return null;
-            });
+            Playlist? playlistLocal;
+            try {
+              playlistLocal = state.firstWhere(
+                (_) => playlist.id == _.id,
+              );
+            } catch (ex) {
+              print(ex);
+            }
             if (playlistLocal == null) {
               mySQLiteDatabase.playlistDbHelper.addPlaylist(playlist);
               state.add(playlist);
@@ -58,30 +62,30 @@ class PlaylistsProvider extends ChangeNotifier {
           }
         });
 
-        if (state == null) state = [];
+        // if (state == null) state = [];
         state.sort();
-        _playlistsStreamController.add(state);
+        _playlistsStreamController!.add(state);
         notifyListeners();
       }, onError: (err) {
-        if (state == null || state.isEmpty) {
+        if (state.isEmpty) {
           error = err.toString();
           notifyListeners();
         }
       });
-      _playlistsStreamController.onCancel = () {
-        _playlistsStreamController.close();
+      _playlistsStreamController!.onCancel = () {
+        _playlistsStreamController!.close();
       };
     });
   }
 
   Stream<List<Playlist>> getPlaylists() {
-    return _playlistsStreamController.stream;
+    return _playlistsStreamController!.stream;
   }
 
   @override
   void dispose() {
-    _querySnapshotStreamSubscription.cancel();
-    _playlistsStreamController.close();
+    _querySnapshotStreamSubscription?.cancel();
+    _playlistsStreamController?.close();
     super.dispose();
   }
 }

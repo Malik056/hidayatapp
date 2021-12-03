@@ -6,11 +6,11 @@ import 'package:hidayat/database/database.dart';
 import 'package:hidayat/models/category.dart';
 
 class CategoriesProvider extends ChangeNotifier {
-  StreamSubscription _querySnapshotStreamSubscription;
-  StreamController<List<Category>> _categoriesStreamController;
+  StreamSubscription? _querySnapshotStreamSubscription;
+  StreamController<List<Category>>? _categoriesStreamController;
   List<Category> state = [];
   ConnectionState connectionState = ConnectionState.waiting;
-  String error;
+  String? error;
 
   CategoriesProvider() {
     _categoriesStreamController = StreamController.broadcast();
@@ -19,10 +19,10 @@ class CategoriesProvider extends ChangeNotifier {
       // if (value == null || value.isEmpty) {
       //   return;
       // }
-      state = value ?? [];
-      if (state != null && state.isNotEmpty) {
+      state = value;
+      if (state.isNotEmpty) {
         state.sort();
-        _categoriesStreamController.add(state);
+        _categoriesStreamController!.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
       }
@@ -43,16 +43,18 @@ class CategoriesProvider extends ChangeNotifier {
         // state = event.docs.map((e) => Category.fromSnapshot(e)).toList();
         var docs;
         docs = event.docChanges;
-        if(docs == null || docs.isEmpty) {
+        if (docs == null || docs.isEmpty) {
           docs = event.docs;
         }
         docs.forEach((element) {
           Category category = Category.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
-            Category categoryLocal =
-                state.firstWhere((_) => category.id == _.id, orElse: () {
-              return null;
-            });
+            Category? categoryLocal;
+            try {
+              categoryLocal = state.firstWhere((_) => category.id == _.id);
+            } catch (ex) {
+              print(ex);
+            }
             if (categoryLocal == null) {
               mySQLiteDatabase.categoryDbHelper.addCategory(category);
               state.add(category);
@@ -70,32 +72,32 @@ class CategoriesProvider extends ChangeNotifier {
             state.removeWhere((_) => _.id == category.id);
           }
         });
-        if (state == null) state = [];
+
         state.sort();
-        _categoriesStreamController.add(state);
+        _categoriesStreamController!.add(state);
         notifyListeners();
       }, onError: (err) {
         print("Error Occurred");
         print("Error: $err");
-        if (state?.isEmpty ?? true) {
+        if (state.isEmpty) {
           error = err.toString();
           notifyListeners();
         }
       });
-      _categoriesStreamController.onCancel = () {
-        _categoriesStreamController.close();
+      _categoriesStreamController!.onCancel = () {
+        _categoriesStreamController!.close();
       };
     });
   }
 
   Stream<List<Category>> getCategories() {
-    return _categoriesStreamController.stream;
+    return _categoriesStreamController!.stream;
   }
 
   @override
   void dispose() {
-    _querySnapshotStreamSubscription.cancel();
-    _categoriesStreamController.close();
+    _querySnapshotStreamSubscription?.cancel();
+    _categoriesStreamController?.close();
     super.dispose();
   }
 }

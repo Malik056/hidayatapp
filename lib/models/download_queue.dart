@@ -13,16 +13,16 @@ class DownloadQueue {
   }
 
   List<DownloadTaskState> getDownloadStateOfPlaylist(String playlistId) {
-    return _downloadQueue[playlistId];
+    return _downloadQueue[playlistId] ?? [];
   }
 
   List<DownloadTaskState> addTask(DownloadTaskState state) {
-    assert(state?.playlistId?.isNotEmpty ?? false);
+    assert(state.playlistId.isNotEmpty);
     String playlistId = state.playlistId;
-    List<DownloadTaskState> tasks = _downloadQueue[playlistId];
+    List<DownloadTaskState>? tasks = _downloadQueue[playlistId];
     if (tasks == null) {
       tasks = [];
-      _downloadQueue.putIfAbsent(playlistId, () => tasks);
+      _downloadQueue.putIfAbsent(playlistId, () => tasks!);
     }
     return tasks..add(state);
   }
@@ -32,9 +32,9 @@ class DownloadQueue {
   }
 
   Future<void> startDownloadQueue(String playlistId,
-      [Function() progressUpdate]) async {
+      [Function()? progressUpdate]) async {
     final dio = Dio();
-    Directory directory = await getExternalStorageDirectory();
+    Directory directory = (await getExternalStorageDirectory())!;
     String path = directory.path;
     int pathSeparator =
         Platform.pathSeparator.codeUnitAt(Platform.pathSeparator.length - 1);
@@ -52,9 +52,9 @@ class DownloadQueue {
             onReceiveProgress: (count, total) async {
               if (total == -1) return;
               var state = value;
-              if (state == null) {
-                return;
-              }
+              // if (state == null) {
+              //   return;
+              // }
               state.status = DownloadTaskStatus.downloading;
               if (progressUpdate != null) progressUpdate();
               state.progress = count / total;

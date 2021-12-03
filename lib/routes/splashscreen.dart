@@ -14,7 +14,7 @@ class SplashScreen extends StatelessWidget {
       await MySQLiteDatabase.getInstance().init();
       await Provider.of<VolumeProvider>(context, listen: false).initialize;
       await Future.delayed(Duration(seconds: 2));
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
         Navigator.pushReplacement(
           context,
           CupertinoPageRoute(

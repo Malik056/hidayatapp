@@ -44,7 +44,7 @@ class MainRoute extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           'Категорияҳо',
-                          style: Theme.of(context).textTheme.caption.copyWith(
+                          style: Theme.of(context).textTheme.caption!.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
@@ -64,7 +64,7 @@ class MainRoute extends StatelessWidget {
                                   snapshot.state[index].name,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle1
+                                      .subtitle1!
                                       .copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -105,7 +105,7 @@ class MainRoute extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
-                      context: _scaffoldKey.currentContext,
+                      context: _scaffoldKey.currentContext ?? context,
                       builder: (context) => BottomSheet(
                         enableDrag: false,
                         onClosing: () {},

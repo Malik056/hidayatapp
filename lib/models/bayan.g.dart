@@ -7,23 +7,35 @@ part of 'bayan.dart';
 // **************************************************************************
 
 Bayan _$BayanFromJson(Map<String, dynamic> json) {
-  $checkKeys(json,
-      requiredKeys: const ['name', 'id', 'playlistId'],
-      disallowNullValues: const ['name', 'id', 'playlistId']);
+  $checkKeys(
+    json,
+    requiredKeys: const ['link', 'name', 'id', 'playlistId'],
+    disallowNullValues: const ['link', 'name', 'id', 'playlistId'],
+  );
   return Bayan(
     json['id'] as String,
     json['link'] as String,
-    json['name'] as String,
-    json['description'] as String ?? '',
+    json['name'] as String?,
+    json['description'] as String? ?? '',
     json['playlistId'] as String,
-  )..filePath = json['filePath'] as String;
+  )..filePath = json['filePath'] as String?;
 }
 
-Map<String, dynamic> _$BayanToJson(Bayan instance) => <String, dynamic>{
-      'link': instance.link,
-      'name': instance.name,
-      'id': instance.id,
-      'playlistId': instance.playlistId,
-      'description': instance.description,
-      'filePath': instance.filePath,
-    };
+Map<String, dynamic> _$BayanToJson(Bayan instance) {
+  final val = <String, dynamic>{
+    'link': instance.link,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('name', instance.name);
+  val['id'] = instance.id;
+  val['playlistId'] = instance.playlistId;
+  val['description'] = instance.description;
+  val['filePath'] = instance.filePath;
+  return val;
+}

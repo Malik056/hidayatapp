@@ -6,20 +6,20 @@ import 'package:hidayat/database/database.dart';
 import 'package:hidayat/models/bayan.dart';
 
 class BayansProvider extends ChangeNotifier {
-  StreamSubscription _querySnapshotStreamSubscription;
-  StreamController<List<Bayan>> _bayansStreamController;
+  StreamSubscription? _querySnapshotStreamSubscription;
+  StreamController<List<Bayan>>? _bayansStreamController;
   List<Bayan> state = [];
   String playlistId;
   ConnectionState connectionState = ConnectionState.waiting;
-  String error;
+  String? error;
 
   BayansProvider(this.playlistId) {
     _bayansStreamController = StreamController();
     MySQLiteDatabase mySQLiteDatabase = MySQLiteDatabase.getInstance();
     mySQLiteDatabase.bayanDbHelper.getBayans(playlistId).then((value) {
       state = value;
-      if (state != null && state.isNotEmpty) {
-        _bayansStreamController.add(state);
+      if (state.isNotEmpty) {
+        _bayansStreamController!.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
       }
@@ -38,10 +38,12 @@ class BayansProvider extends ChangeNotifier {
         event.docChanges.forEach((element) {
           Bayan bayan = Bayan.fromSnapshot(element.doc);
           if (element.type == DocumentChangeType.added) {
-            Bayan bayanLocal =
-                state.firstWhere((_) => bayan.id == _.id, orElse: () {
-              return null;
-            });
+            Bayan? bayanLocal;
+            try {
+              bayanLocal = state.firstWhere((_) => bayan.id == _.id);
+            } catch (ex) {
+              print(ex);
+            }
             if (bayanLocal == null) {
               mySQLiteDatabase.bayanDbHelper.addBayan(bayan);
               state.add(bayan);
@@ -59,30 +61,27 @@ class BayansProvider extends ChangeNotifier {
             state.removeWhere((_) => _.id == bayan.id);
           }
         });
-        if (state == null) {
-          state = [];
-        } else {}
-        _bayansStreamController.add(state);
+        _bayansStreamController!.add(state);
         notifyListeners();
       }, onError: (_) {
         if (connectionState == ConnectionState.waiting) {
           error = _.toString();
         }
       });
-      _bayansStreamController.onCancel = () {
-        _bayansStreamController.close();
+      _bayansStreamController!.onCancel = () {
+        _bayansStreamController!.close();
       };
     });
   }
 
   Stream<List<Bayan>> getBayans() {
-    return _bayansStreamController.stream;
+    return _bayansStreamController!.stream;
   }
 
   @override
   void dispose() {
-    _querySnapshotStreamSubscription.cancel();
-    _bayansStreamController.close();
+    _querySnapshotStreamSubscription?.cancel();
+    _bayansStreamController?.close();
     super.dispose();
   }
 }

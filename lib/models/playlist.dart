@@ -7,24 +7,24 @@ import 'category.dart';
 
 part 'playlist.g.dart';
 
-@JsonSerializable(nullable: true)
+@JsonSerializable()
 class Playlist with Comparable<Playlist> {
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
-  String name;
-  String image;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+  @JsonKey(required: true, disallowNullValue: true)
+  String? name;
+  String? image;
+  @JsonKey(required: true, disallowNullValue: true)
   String categoryId;
   String description;
   @JsonKey(ignore: true)
-  List<Bayan> bayans;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+  List<Bayan>? bayans;
+  @JsonKey(required: true, disallowNullValue: true)
   String id;
 
   Playlist(this.id, this.name, this.image, this.description, this.categoryId);
   factory Playlist.fromJson(Map<String, dynamic> json) =>
       _$PlaylistFromJson(json);
   factory Playlist.fromSnapshot(DocumentSnapshot snapshot) {
-    Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.data());
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     data.putIfAbsent('id', () => snapshot.id);
     return Playlist.fromJson(data);
   }
@@ -72,6 +72,9 @@ class Playlist with Comparable<Playlist> {
 
   @override
   int compareTo(Playlist other) {
-    return name.compareTo(other.name);
+    if (name == other.name) return 0;
+    if (name == null) return -1;
+    if (other.name == null) return 1;
+    return name!.compareTo(other.name!);
   }
 }

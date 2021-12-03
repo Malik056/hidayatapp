@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/physics.dart';
 
 class FastScrollPhysics extends ScrollPhysics {
-  const FastScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+  const FastScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  FastScrollPhysics applyTo(ScrollPhysics ancestor) {
+  ScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return FastScrollPhysics(parent: buildParent(ancestor));
   }
 

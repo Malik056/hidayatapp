@@ -5,35 +5,36 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'bayan.g.dart';
 
-@JsonSerializable(nullable: true)
+@JsonSerializable()
 class Bayan extends Downloadable {
+  @JsonKey(required: true, disallowNullValue: true)
   String link;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
-  String name;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+  @JsonKey(required: true, disallowNullValue: true)
+  String? name;
+  @JsonKey(required: true, disallowNullValue: true)
   String id;
-  @JsonKey(required: true, nullable: false, disallowNullValue: true)
+  @JsonKey(required: true, disallowNullValue: true)
   String playlistId;
   @JsonKey(defaultValue: "")
   String description;
   @JsonKey(defaultValue: null)
-  String filePath;
+  String? filePath;
 
   Bayan(this.id, this.link, this.name, this.description, this.playlistId);
   factory Bayan.fromJson(Map<String, dynamic> json) => _$BayanFromJson(json);
   factory Bayan.fromSnapshot(DocumentSnapshot snapshot) {
-    Map<String, dynamic> data = Map<String, dynamic>.from(snapshot.data());
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
     data.putIfAbsent('id', () => snapshot.id);
     return Bayan.fromJson(data);
   }
   Map<String, dynamic> toJson() => _$BayanToJson(this);
 
   String getUniqueFileName() {
-    var split = name.split('.');
-    if (split.length <= 1) {
+    var split = name?.split('.');
+    if ((split?.length ?? 0) <= 1) {
       return id;
     }
-    String ext = split[split.length - 1];
+    String ext = split![split.length - 1];
     if (ext.contains(' ')) {
       return id;
     }

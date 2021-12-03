@@ -8,17 +8,17 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class MySQLiteDatabase {
-  static MySQLiteDatabase _mySQLiteDatabase;
-  Database database;
-  BayanDbHelper bayanDbHelper;
-  CategoryDbHelper categoryDbHelper;
-  PlaylistDbHelper playlistDbHelper;
+  static MySQLiteDatabase? _mySQLiteDatabase;
+  late Database database;
+  late BayanDbHelper bayanDbHelper;
+  late CategoryDbHelper categoryDbHelper;
+  late PlaylistDbHelper playlistDbHelper;
 
   static MySQLiteDatabase getInstance() {
     if (_mySQLiteDatabase == null) {
       _mySQLiteDatabase = MySQLiteDatabase._();
     }
-    return _mySQLiteDatabase;
+    return _mySQLiteDatabase!;
   }
 
   MySQLiteDatabase._();
