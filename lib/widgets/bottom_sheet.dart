@@ -76,7 +76,7 @@ class _MediaPlayerSheetState extends State<MediaPlayerSheet> {
           //   data.setVolume(value);
           // },
           // audioState: data.state.audioState,
-          // bayanName: "${index + 1}. ${bayan.name ?? "Anonymous"}",
+          // bayanName: "${index + 1}. ${bayan.name ?? "Номаълум"}",
           // onPlayPressed: () {
           //   data.player.playOrPause();
           // },

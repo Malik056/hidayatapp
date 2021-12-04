@@ -38,16 +38,16 @@ class EmptyCategoriesWidget extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text.rich(
               TextSpan(children: [
-                TextSpan(text: "Failed to Load!\n"), // TODO: TRANSLATION
+                TextSpan(text: "Комёб нашуд!\n"),
                 TextSpan(
-                  text: "Check your Internet Connection!\n", // TODO: TRANSLATION
+                  text: "Ба интернет пайваст шавед!\n",
                   style: theme.bodyText2!.copyWith(color: Colors.white),
                 ),
                 WidgetSpan(
                   child: TextButton(
                     onPressed: onReload,
                     child: Text(
-                      "Tap to Reload".toUpperCase(), // TODO: TRANSLATION
+                      "Инҷоро зер кунед".toUpperCase(),
                       style: theme.subtitle1!.copyWith(
                         color: Colors.blue,
                       ),

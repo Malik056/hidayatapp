@@ -22,7 +22,7 @@ class Utils {
 
   static Widget getStaticSnackbar(
     String text, {
-    String actionText = "Retry",
+    String actionText = "Такрор кун",
     Color textColor = Colors.white,
     Color? actionTextColor,
     VoidCallback? onAction,
@@ -68,7 +68,7 @@ class Utils {
 
   static SnackBar getSnackbar(
     String text, {
-    String actionText = "Retry",
+    String actionText = "Такрор кун",
     Color textColor = Colors.white,
     Color? actionTextColor,
     VoidCallback? onAction,

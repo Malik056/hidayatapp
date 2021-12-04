@@ -67,11 +67,11 @@ class _BayansRouteState extends State<BayansRoute> {
                     await downloadProvider.downloadPlaylist(widget.playlist);
                   } catch (ex) {
                     Utils.showInSnackbarError(_scaffoldKey, context,
-                        "An Error Occurred while downloading! Please check your internet connection"); // TODO: TRANSLATION
+                        "Мушкилӣ бо интернет, аз нав пайваст шавед.");
                   }
                 } else {
-                  Utils.showInSnackbarError(_scaffoldKey, context,
-                      "No Internet Connection"); // TODO: TRANSLATION
+                  Utils.showInSnackbarError(
+                      _scaffoldKey, context, "Интернет надоред!");
                 }
               },
         icon: Icon(
@@ -172,12 +172,9 @@ class _BayansRouteState extends State<BayansRoute> {
                                   ? Center(
                                       child: Text.rich(
                                         TextSpan(children: [
+                                          TextSpan(text: "Комёб нашуд\n"),
                                           TextSpan(
-                                              text:
-                                                  "Could not load data\n"), // TODO: TRANSLATION
-                                          TextSpan(
-                                            text:
-                                                "Check you internet connection\n", // TODO: TRANSLATION
+                                            text: "Ба интернет пайваст шавед\n",
                                             style:
                                                 textTheme.subtitle1!.copyWith(
                                               color: Colors.black,
@@ -189,7 +186,8 @@ class _BayansRouteState extends State<BayansRoute> {
                                                 setState(() {});
                                               },
                                               child: Text(
-                                                "Tap to Reload".toUpperCase(),
+                                                "Инҷоро зер кунед"
+                                                    .toUpperCase(),
                                                 style: textTheme.subtitle1!
                                                     .copyWith(
                                                   color: Colors.blue,
@@ -294,8 +292,8 @@ class _BayansRouteState extends State<BayansRoute> {
                                                                                           // Specify a unique ID for each media item:
                                                                                           id: e.id,
                                                                                           // Metadata to display in the notification:
-                                                                                          album: widget.playlist.name ?? "Anonymous",
-                                                                                          title: e.name ?? "Anonymous",
+                                                                                          album: widget.playlist.name ?? "Номаълум",
+                                                                                          title: e.name ?? "Номаълум",
                                                                                           artUri: ((widget.playlist.image?.isEmpty ?? '') == '')
                                                                                               ? zPlaceHolderImage == null
                                                                                                   ? null
@@ -317,8 +315,8 @@ class _BayansRouteState extends State<BayansRoute> {
                                                                                           // Specify a unique ID for each media item:
                                                                                           id: e.id,
                                                                                           // Metadata to display in the notification:
-                                                                                          album: widget.playlist.name ?? "Anonymous",
-                                                                                          title: e.name ?? "Anonymous",
+                                                                                          album: widget.playlist.name ?? "Номаълум",
+                                                                                          title: e.name ?? "Номаълум",
                                                                                           artUri: ((widget.playlist.image?.isEmpty ?? '') == '')
                                                                                               ? zPlaceHolderImage == null
                                                                                                   ? null
@@ -346,7 +344,7 @@ class _BayansRouteState extends State<BayansRoute> {
                                                                     .showInSnackbarError(
                                                                   _scaffoldKey,
                                                                   context,
-                                                                  "Error while playing, check your network connection!", //TODO: Translation
+                                                                  "Мушкилӣ бо интернет, дубора пайваст шавед",
                                                                 );
                                                                 print(ex);
                                                               }
@@ -380,7 +378,7 @@ class _BayansRouteState extends State<BayansRoute> {
                                                                             _isAudioLoaded(snapshot.data!.processingState)
                                                                         ? Marquee(
                                                                             text:
-                                                                                data.state[index].name ?? "Anonymous",
+                                                                                data.state[index].name ?? "Номаълум",
                                                                             style:
                                                                                 textTheme.subtitle1!.copyWith(
                                                                               color: Colors.black,
@@ -390,7 +388,7 @@ class _BayansRouteState extends State<BayansRoute> {
                                                                           )
                                                                         : Text(
                                                                             data.state[index].name ??
-                                                                                "Anonymous",
+                                                                                "Номаълум",
                                                                             style:
                                                                                 textTheme.subtitle1!.copyWith(
                                                                               color: Colors.black,

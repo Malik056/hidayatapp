@@ -57,13 +57,13 @@ import '../globals/config.dart' as globals;
 //   String get playlistName {
 //     String album =
 //         _player?.current?.valueWrapper?.value?.audio?.audio?.metas?.album;
-//     return (album ?? '').isEmpty ? "Anonymous" : album;
+//     return (album ?? '').isEmpty ? "Номаълум" : album;
 //   }
 //
 //   String get bayanName {
 //     String title =
 //         _player?.current?.valueWrapper?.value?.audio?.audio?.metas?.title;
-//     return (title ?? '').isEmpty ? "Anonymous" : title;
+//     return (title ?? '').isEmpty ? "Номаълум" : title;
 //   }
 //
 //   Stream<Duration> get positionStream =>
@@ -285,10 +285,10 @@ class PlayingNowProvider extends ChangeNotifier {
       return (_player.audioSource?.sequence[_player.currentIndex!].tag
                   as MediaItem?)
               ?.title ??
-          "Anonymous";
+          "Номаълум";
     } catch (ex) {
       print(ex);
-      return "Anonymous";
+      return "Номаълум";
     }
   }
 
@@ -297,10 +297,10 @@ class PlayingNowProvider extends ChangeNotifier {
       return (_player.audioSource?.sequence[_player.currentIndex!].tag
                   as MediaItem?)
               ?.album ??
-          "Anonymous";
+          "Номаълум";
     } catch (ex) {
       print(ex);
-      return "Anonymous";
+      return "Номаълум";
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
         var user = FirebaseAuth.instance.currentUser;
         if (user?.uid == null) {
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: "anonymous@hidoyat.com",
+            email: "Номаълум@hidoyat.com",
             password: zPswd,
           );
         }
