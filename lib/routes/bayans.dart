@@ -51,16 +51,16 @@ class BayansRoute extends StatelessWidget {
       return TextButton.icon(
         onPressed: downloaded
             ? null
-            : () {
+            : () async {
                 if (Provider.of<ConnectivityProvider>(context, listen: false)
                         .state
                         ?.connected ??
                     false) {
                   try {
-                    downloadProvider.downloadPlaylist(playlist);
+                    await downloadProvider.downloadPlaylist(playlist);
                   } catch (ex) {
                     Utils.showInSnackbarError(_scaffoldKey, context,
-                        "An Error Occurred while downloading");
+                        "An Error Occurred while downloading! Please check your internet connection");
                   }
                 } else {
                   Utils.showInSnackbarError(
@@ -244,63 +244,72 @@ class BayansRoute extends StatelessWidget {
                                                                         index);
                                                                 return;
                                                               }
-
-                                                              provider.playPlaylist(
-                                                                  playlist.bayans
-                                                                          ?.map<AudioSource>((e) => (e.filePath?.isEmpty ?? true)
-                                                                                  ? AudioSource.uri(
-                                                                                      Uri.parse(e.link),
-                                                                                      tag: MediaItem(
-                                                                                        // Specify a unique ID for each media item:
-                                                                                        id: e.id,
-                                                                                        // Metadata to display in the notification:
-                                                                                        album: playlist.name ?? "Anonymous",
-                                                                                        title: e.name ?? "Anonymous",
-                                                                                        artUri: ((playlist.image?.isEmpty ?? '') == '')
-                                                                                            ? zPlaceHolderImage == null
-                                                                                                ? null
-                                                                                                : Uri.dataFromBytes(zPlaceHolderImage!.toList())
-                                                                                            : Uri.parse(
-                                                                                                playlist.image!,
-                                                                                              ),
-                                                                                        extras: {
-                                                                                          "index": index,
-                                                                                          "playlistId": playlist.id,
-                                                                                        },
-                                                                                      ),
-                                                                                    )
-                                                                                  : AudioSource.uri(
-                                                                                      Uri.parse(e.filePath!),
-                                                                                      // tag:
-                                                                                      // audio_player.Metas(
-                                                                                      tag: MediaItem(
-                                                                                        // Specify a unique ID for each media item:
-                                                                                        id: e.id,
-                                                                                        // Metadata to display in the notification:
-                                                                                        album: playlist.name ?? "Anonymous",
-                                                                                        title: e.name ?? "Anonymous",
-                                                                                        artUri: ((playlist.image?.isEmpty ?? '') == '')
-                                                                                            ? zPlaceHolderImage == null
-                                                                                                ? null
-                                                                                                : Uri.dataFromBytes(zPlaceHolderImage!.toList())
-                                                                                            : Uri.parse(
-                                                                                                playlist.image!,
-                                                                                              ),
-                                                                                        extras: {
-                                                                                          "index": index,
-                                                                                          "playlistId": playlist.id,
-                                                                                        },
-                                                                                      ),
-                                                                                    )
-                                                                              // image: ((playlist.image?.isEmpty ?? '') == '')
-                                                                              //     ? audio_player.MetasImage.asset('images/placeholder_playlist.jpg')
-                                                                              //     : audio_player.MetasImage.network(playlist.image),
-                                                                              // ),
-                                                                              // ),
-                                                                              )
-                                                                          .toList() ??
-                                                                      [],
-                                                                  index);
+                                                              try {
+                                                                await provider.playPlaylist(
+                                                                    playlist.bayans
+                                                                            ?.map<AudioSource>((e) => (e.filePath?.isEmpty ?? true)
+                                                                                    ? AudioSource.uri(
+                                                                                        Uri.parse(e.link),
+                                                                                        tag: MediaItem(
+                                                                                          // Specify a unique ID for each media item:
+                                                                                          id: e.id,
+                                                                                          // Metadata to display in the notification:
+                                                                                          album: playlist.name ?? "Anonymous",
+                                                                                          title: e.name ?? "Anonymous",
+                                                                                          artUri: ((playlist.image?.isEmpty ?? '') == '')
+                                                                                              ? zPlaceHolderImage == null
+                                                                                                  ? null
+                                                                                                  : Uri.dataFromBytes(zPlaceHolderImage!.toList())
+                                                                                              : Uri.parse(
+                                                                                                  playlist.image!,
+                                                                                                ),
+                                                                                          extras: {
+                                                                                            "index": index,
+                                                                                            "playlistId": playlist.id,
+                                                                                          },
+                                                                                        ),
+                                                                                      )
+                                                                                    : AudioSource.uri(
+                                                                                        Uri.parse(e.filePath!),
+                                                                                        // tag:
+                                                                                        // audio_player.Metas(
+                                                                                        tag: MediaItem(
+                                                                                          // Specify a unique ID for each media item:
+                                                                                          id: e.id,
+                                                                                          // Metadata to display in the notification:
+                                                                                          album: playlist.name ?? "Anonymous",
+                                                                                          title: e.name ?? "Anonymous",
+                                                                                          artUri: ((playlist.image?.isEmpty ?? '') == '')
+                                                                                              ? zPlaceHolderImage == null
+                                                                                                  ? null
+                                                                                                  : Uri.dataFromBytes(zPlaceHolderImage!.toList())
+                                                                                              : Uri.parse(
+                                                                                                  playlist.image!,
+                                                                                                ),
+                                                                                          extras: {
+                                                                                            "index": index,
+                                                                                            "playlistId": playlist.id,
+                                                                                          },
+                                                                                        ),
+                                                                                      )
+                                                                                // image: ((playlist.image?.isEmpty ?? '') == '')
+                                                                                //     ? audio_player.MetasImage.asset('images/placeholder_playlist.jpg')
+                                                                                //     : audio_player.MetasImage.network(playlist.image),
+                                                                                // ),
+                                                                                // ),
+                                                                                )
+                                                                            .toList() ??
+                                                                        [],
+                                                                    index);
+                                                              } catch (ex) {
+                                                                Utils
+                                                                    .showInSnackbarError(
+                                                                  _scaffoldKey,
+                                                                  context,
+                                                                  "Error while playing, check your network connection!", //TODO: Translation
+                                                                );
+                                                                print(ex);
+                                                              }
                                                             },
                                                             child: Container(
                                                               height: 40,

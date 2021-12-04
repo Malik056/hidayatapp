@@ -32,7 +32,7 @@ class DownloadProvider extends ChangeNotifier {
     return avg / downloadStates.length;
   }
 
-  void downloadPlaylist(Playlist playlist) async {
+  Future<void> downloadPlaylist(Playlist playlist) async {
     pauseDownloadButton = true;
     notifyListeners();
     List<Bayan> bayans = playlist.bayans ?? [];
@@ -87,9 +87,16 @@ class DownloadProvider extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    _taskQueue.startDownloadQueue(playlist.id, () {
+    try {
+      await _taskQueue.startDownloadQueue(playlist.id, () {
+        notifyListeners();
+      });
+    } catch (ex) {
+      print(ex);
+      _taskQueue.removePlaylistTasks(playlist.id);
       notifyListeners();
-    });
+      throw ex;
+    }
     notifyListeners();
   }
 

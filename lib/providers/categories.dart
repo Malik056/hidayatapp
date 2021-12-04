@@ -7,7 +7,7 @@ import 'package:hidayat/models/category.dart';
 
 class CategoriesProvider extends ChangeNotifier {
   StreamSubscription? _querySnapshotStreamSubscription;
-  StreamController<List<Category>>? _categoriesStreamController;
+  late StreamController<List<Category>> _categoriesStreamController;
   List<Category> state = [];
   ConnectionState connectionState = ConnectionState.waiting;
   String? error;
@@ -20,9 +20,10 @@ class CategoriesProvider extends ChangeNotifier {
       //   return;
       // }
       state = value;
+      notifyListeners();
       if (state.isNotEmpty) {
         state.sort();
-        _categoriesStreamController!.add(state);
+        _categoriesStreamController.add(state);
         connectionState = ConnectionState.active;
         notifyListeners();
       }
@@ -74,8 +75,9 @@ class CategoriesProvider extends ChangeNotifier {
         });
 
         state.sort();
-        _categoriesStreamController!.add(state);
+        _categoriesStreamController.add(state);
         notifyListeners();
+        error = null;
       }, onError: (err) {
         print("Error Occurred");
         print("Error: $err");
@@ -84,20 +86,20 @@ class CategoriesProvider extends ChangeNotifier {
           notifyListeners();
         }
       });
-      _categoriesStreamController!.onCancel = () {
-        _categoriesStreamController!.close();
+      _categoriesStreamController.onCancel = () {
+        _categoriesStreamController.close();
       };
     });
   }
 
   Stream<List<Category>> getCategories() {
-    return _categoriesStreamController!.stream;
+    return _categoriesStreamController.stream;
   }
 
   @override
   void dispose() {
     _querySnapshotStreamSubscription?.cancel();
-    _categoriesStreamController?.close();
+    _categoriesStreamController.close();
     super.dispose();
   }
 }

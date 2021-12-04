@@ -251,11 +251,18 @@ class PlayingNowProvider extends ChangeNotifier {
     }
     _player = AudioPlayer();
     notifyListeners();
-    _player.setAudioSource(
-      ConcatenatingAudioSource(children: audios),
-      initialIndex: startIndex,
-    );
-    _player.play();
+    try {
+      await _player.setAudioSource(
+        ConcatenatingAudioSource(children: audios),
+        initialIndex: startIndex,
+      );
+      await _player.play();
+    } catch (ex) {
+      print(ex);
+      await _player.dispose();
+      _player = AudioPlayer();
+      throw ex;
+    }
   }
 
   Future<void> playAtIndex(int index) async {
@@ -410,6 +417,4 @@ class PlayingNowProvider extends ChangeNotifier {
       print(ex);
     }
   }
-
-
 }

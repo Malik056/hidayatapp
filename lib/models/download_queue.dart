@@ -71,6 +71,7 @@ class DownloadQueue {
           );
         } catch (ex) {
           print(ex);
+          throw ex;
         }
       }
     }
