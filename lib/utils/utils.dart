@@ -20,6 +20,52 @@ class Utils {
     }
   }
 
+  static Widget getStaticSnackbar(
+    String text, {
+    String actionText = "Retry",
+    Color textColor = Colors.white,
+    Color? actionTextColor,
+    VoidCallback? onAction,
+    Color backgroundColor = Colors.black,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      decoration: ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        color: Colors.black,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          onAction == null
+              ? SizedBox()
+              : TextButton(
+                  child: Text(
+                    actionText,
+                    style: TextStyle(
+                      color: actionTextColor ?? Colors.yellow[700],
+                    ),
+                  ),
+                  onPressed: () {
+                    onAction();
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+
   static SnackBar getSnackbar(
     String text, {
     String actionText = "Retry",

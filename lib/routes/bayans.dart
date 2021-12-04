@@ -16,10 +16,17 @@ import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 import 'package:marquee/marquee.dart';
 import 'package:provider/provider.dart';
 
-class BayansRoute extends StatelessWidget {
+class BayansRoute extends StatefulWidget {
   final myPlaylist.Playlist playlist;
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   BayansRoute({Key? key, required this.playlist}) : super(key: key);
+
+  @override
+  State<BayansRoute> createState() => _BayansRouteState();
+}
+
+class _BayansRouteState extends State<BayansRoute> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool isLoading(BayansProvider data) {
     return (data.connectionState == ConnectionState.waiting &&
@@ -37,10 +44,10 @@ class BayansRoute extends StatelessWidget {
   Widget buildDownloadBar(BuildContext context, BayansProvider provider,
       DownloadProvider downloadProvider) {
     List<Bayan> bayans = provider.state;
-    int totalTasks = downloadProvider.totalTasks(playlist.id);
+    int totalTasks = downloadProvider.totalTasks(widget.playlist.id);
     if (totalTasks == -1 || totalTasks == 0) {
       if (totalTasks == 0) {
-        downloadProvider.removeAlltasksForPlaylist(playlist.id);
+        downloadProvider.removeAlltasksForPlaylist(widget.playlist.id);
       }
       bool downloaded = true;
       bayans.forEach((element) {
@@ -57,14 +64,14 @@ class BayansRoute extends StatelessWidget {
                         ?.connected ??
                     false) {
                   try {
-                    await downloadProvider.downloadPlaylist(playlist);
+                    await downloadProvider.downloadPlaylist(widget.playlist);
                   } catch (ex) {
                     Utils.showInSnackbarError(_scaffoldKey, context,
-                        "An Error Occurred while downloading! Please check your internet connection");
+                        "An Error Occurred while downloading! Please check your internet connection"); // TODO: TRANSLATION
                   }
                 } else {
-                  Utils.showInSnackbarError(
-                      _scaffoldKey, context, "No Internet Connection");
+                  Utils.showInSnackbarError(_scaffoldKey, context,
+                      "No Internet Connection"); // TODO: TRANSLATION
                 }
               },
         icon: Icon(
@@ -73,7 +80,7 @@ class BayansRoute extends StatelessWidget {
         label: Text(downloaded ? "скачано" : "скачать"),
       );
     } else {
-      double avgProgress = downloadProvider.avgProgress(playlist.id);
+      double avgProgress = downloadProvider.avgProgress(widget.playlist.id);
       return Row(
         children: [
           Spacer(),
@@ -115,7 +122,7 @@ class BayansRoute extends StatelessWidget {
       child: Scaffold(
         key: _scaffoldKey,
         body: ChangeNotifierProvider<BayansProvider>(
-            create: (context) => BayansProvider(playlist.id),
+            create: (context) => BayansProvider(widget.playlist.id),
             child: Consumer<PlayingNowProvider>(
               builder: (ctx, PlayingNowProvider playingNow, _) =>
                   Consumer<BayansProvider>(
@@ -137,7 +144,7 @@ class BayansRoute extends StatelessWidget {
                                   height: mediaQuery.height * 0.3 +
                                       mediaQueryData.padding.top,
                                   width: mediaQuery.width,
-                                  imageUrl: playlist.image ?? '',
+                                  imageUrl: widget.playlist.image ?? '',
                                   fadeInDuration: Duration.zero,
                                   fadeOutDuration: Duration.zero,
                                   fit: BoxFit.cover,
@@ -155,7 +162,7 @@ class BayansRoute extends StatelessWidget {
                                   //     'images/placeholder_playlist.jpg',
                                   //     fit: BoxFit.cover),
                                 ),
-                                title: Text(playlist.name ?? 'Playlist'),
+                                title: Text(widget.playlist.name ?? 'Playlist'),
                               ),
                             ];
                           },
@@ -163,12 +170,42 @@ class BayansRoute extends StatelessWidget {
                               ? Center(child: CircularProgressIndicator())
                               : (data.state.isEmpty)
                                   ? Center(
-                                      child: Text(
-                                      "Nothing Found",
-                                      style: textTheme.headline5!.copyWith(
-                                        color: Colors.black,
+                                      child: Text.rich(
+                                        TextSpan(children: [
+                                          TextSpan(
+                                              text:
+                                                  "Could not load data\n"), // TODO: TRANSLATION
+                                          TextSpan(
+                                            text:
+                                                "Check you internet connection\n", // TODO: TRANSLATION
+                                            style:
+                                                textTheme.subtitle1!.copyWith(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          WidgetSpan(
+                                            child: TextButton(
+                                              onPressed: () {
+                                                setState(() {});
+                                              },
+                                              child: Text(
+                                                "Tap to Reload".toUpperCase(),
+                                                style: textTheme.subtitle1!
+                                                    .copyWith(
+                                                  color: Colors.blue,
+                                                  // fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                        textAlign: TextAlign.center,
+                                        style: textTheme.headline4!.copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ))
+                                    )
                                   : Column(
                                       children: [
                                         Center(
@@ -211,7 +248,7 @@ class BayansRoute extends StatelessWidget {
                                                     itemCount:
                                                         data.state.length,
                                                     itemBuilder: (ctx, index) {
-                                                      playlist.bayans =
+                                                      widget.playlist.bayans =
                                                           data.state;
                                                       return Column(
                                                         mainAxisSize:
@@ -225,7 +262,8 @@ class BayansRoute extends StatelessWidget {
                                                                       context,
                                                                       listen:
                                                                           false);
-                                                              if (playlist
+                                                              if (widget
+                                                                      .playlist
                                                                       .bayans?[
                                                                           index]
                                                                       .id ==
@@ -238,7 +276,9 @@ class BayansRoute extends StatelessWidget {
                                                                   provider
                                                                       .playlistId;
                                                               if (pLId ==
-                                                                  playlist.id) {
+                                                                  widget
+                                                                      .playlist
+                                                                      .id) {
                                                                 provider
                                                                     .playAtIndex(
                                                                         index);
@@ -246,7 +286,7 @@ class BayansRoute extends StatelessWidget {
                                                               }
                                                               try {
                                                                 await provider.playPlaylist(
-                                                                    playlist.bayans
+                                                                    widget.playlist.bayans
                                                                             ?.map<AudioSource>((e) => (e.filePath?.isEmpty ?? true)
                                                                                     ? AudioSource.uri(
                                                                                         Uri.parse(e.link),
@@ -254,18 +294,18 @@ class BayansRoute extends StatelessWidget {
                                                                                           // Specify a unique ID for each media item:
                                                                                           id: e.id,
                                                                                           // Metadata to display in the notification:
-                                                                                          album: playlist.name ?? "Anonymous",
+                                                                                          album: widget.playlist.name ?? "Anonymous",
                                                                                           title: e.name ?? "Anonymous",
-                                                                                          artUri: ((playlist.image?.isEmpty ?? '') == '')
+                                                                                          artUri: ((widget.playlist.image?.isEmpty ?? '') == '')
                                                                                               ? zPlaceHolderImage == null
                                                                                                   ? null
                                                                                                   : Uri.dataFromBytes(zPlaceHolderImage!.toList())
                                                                                               : Uri.parse(
-                                                                                                  playlist.image!,
+                                                                                                  widget.playlist.image!,
                                                                                                 ),
                                                                                           extras: {
                                                                                             "index": index,
-                                                                                            "playlistId": playlist.id,
+                                                                                            "playlistId": widget.playlist.id,
                                                                                           },
                                                                                         ),
                                                                                       )
@@ -277,18 +317,18 @@ class BayansRoute extends StatelessWidget {
                                                                                           // Specify a unique ID for each media item:
                                                                                           id: e.id,
                                                                                           // Metadata to display in the notification:
-                                                                                          album: playlist.name ?? "Anonymous",
+                                                                                          album: widget.playlist.name ?? "Anonymous",
                                                                                           title: e.name ?? "Anonymous",
-                                                                                          artUri: ((playlist.image?.isEmpty ?? '') == '')
+                                                                                          artUri: ((widget.playlist.image?.isEmpty ?? '') == '')
                                                                                               ? zPlaceHolderImage == null
                                                                                                   ? null
                                                                                                   : Uri.dataFromBytes(zPlaceHolderImage!.toList())
                                                                                               : Uri.parse(
-                                                                                                  playlist.image!,
+                                                                                                  widget.playlist.image!,
                                                                                                 ),
                                                                                           extras: {
                                                                                             "index": index,
-                                                                                            "playlistId": playlist.id,
+                                                                                            "playlistId": widget.playlist.id,
                                                                                           },
                                                                                         ),
                                                                                       )
@@ -334,7 +374,7 @@ class BayansRoute extends StatelessWidget {
                                                                       )),
                                                                   Expanded(
                                                                     flex: 4,
-                                                                    child: playingNow.id == playlist.bayans?[index].id &&
+                                                                    child: playingNow.id == widget.playlist.bayans?[index].id &&
                                                                             snapshot.data?.processingState !=
                                                                                 null &&
                                                                             _isAudioLoaded(snapshot.data!.processingState)
@@ -359,7 +399,8 @@ class BayansRoute extends StatelessWidget {
                                                                   ),
                                                                   if (playingNow
                                                                               .id ==
-                                                                          playlist
+                                                                          widget
+                                                                              .playlist
                                                                               .bayans?[
                                                                                   index]
                                                                               .id &&
@@ -373,7 +414,8 @@ class BayansRoute extends StatelessWidget {
                                                                         .volume_up),
                                                                   if (playingNow
                                                                           .id ==
-                                                                      playlist
+                                                                      widget
+                                                                          .playlist
                                                                           .bayans?[
                                                                               index]
                                                                           .id)

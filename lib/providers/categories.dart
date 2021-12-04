@@ -76,8 +76,8 @@ class CategoriesProvider extends ChangeNotifier {
 
         state.sort();
         _categoriesStreamController.add(state);
-        notifyListeners();
         error = null;
+        notifyListeners();
       }, onError: (err) {
         print("Error Occurred");
         print("Error: $err");

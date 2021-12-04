@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:dart_ping_ios/dart_ping_ios.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,9 +27,6 @@ void main() async {
   }
 
   await Firebase.initializeApp();
-  if (FirebaseAuth.instance.currentUser == null) {
-    FirebaseAuth.instance.signInAnonymously();
-  }
   var prefs = await SharedPreferences.getInstance();
 
   try {
@@ -65,21 +63,27 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => SelectedCategory()),
         ChangeNotifierProvider(create: (ctx) => ConnectivityProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Hidoyaat',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          platform: TargetPlatform.iOS,
-          sliderTheme: SliderThemeData(
-            trackHeight: 01,
-            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 5.0),
-            trackShape: RoundedRectSliderTrackShape(),
-
+      child: MediaQuery(
+        data: MediaQueryData.fromWindow(window)
+          ..copyWith(
+            textScaleFactor:
+                (window.physicalSize.width / window.devicePixelRatio) / 375,
           ),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Hidoyaat',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            platform: TargetPlatform.iOS,
+            sliderTheme: SliderThemeData(
+              trackHeight: 01,
+              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 5.0),
+              trackShape: RoundedRectSliderTrackShape(),
+            ),
+          ),
+          home: SplashScreen(),
         ),
-        home: SplashScreen(),
       ),
     );
   }

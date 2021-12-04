@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:hidayat/models/playlist.dart';
 import 'package:hidayat/routes/bayans.dart';
 
@@ -85,7 +86,11 @@ class PlaylistWidget extends StatelessWidget {
 }
 
 class EmptyPlaylistWidget extends StatelessWidget {
-  const EmptyPlaylistWidget({Key? key}) : super(key: key);
+  final VoidCallback onReload;
+  const EmptyPlaylistWidget({
+    Key? key,
+    required this.onReload,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -111,10 +116,27 @@ class EmptyPlaylistWidget extends StatelessWidget {
           Center(
               child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text(
-              "No Playlist Found!",
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: "No Playlist Found!\n"), // TODO: TRANSLATION
+                TextSpan(
+                  text: "Check you internet Connection!\n", // TODO: TRANSLATION
+                  style: theme.bodyText2!.copyWith(color: Colors.white),
+                ),
+                WidgetSpan(
+                  child: TextButton(
+                    onPressed: onReload,
+                    child: Text(
+                      "Tap to Reload".toUpperCase(), // TODO: TRANSLATION
+                      style: theme.subtitle1!.copyWith(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
               textAlign: TextAlign.center,
-              style: theme.headline4!.copyWith(color: Colors.white),
+              style: theme.headline5!.copyWith(color: Colors.white),
             ),
           )),
         ],
