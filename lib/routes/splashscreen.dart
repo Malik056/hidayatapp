@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
         var user = FirebaseAuth.instance.currentUser;
         if (user?.uid == null) {
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: "Номаълум@hidoyat.com",
+            email: "anonymous@hidoyat.com",
             password: zPswd,
           );
         }
@@ -69,8 +69,8 @@ class _SplashScreenState extends State<SplashScreen> {
             future: initializeAndReroute(context),
             builder: (context, ss) {
               if (ss.hasData && !ss.data!) {
-                return Utils.getStaticSnackbar("Couldn't authenticate user.",
-                    onAction: () {
+                return Utils.getStaticSnackbar(
+                    "Ба интернет пайваст шав ва аз нав даро!", onAction: () {
                   setState(() {});
                 });
               }
